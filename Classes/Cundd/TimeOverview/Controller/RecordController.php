@@ -7,6 +7,7 @@ namespace Cundd\TimeOverview\Controller;
  *                                                                        */
 ini_set('display_errors', TRUE);
 use TYPO3\Flow\Annotations as Flow;
+use Cundd\TimeOverview\Domain\Model\Date as Date;
 use Cundd\TimeOverview\Domain\Model\Record as Record;
 use Cundd\TimeOverview\Domain\Repository\RecordRepository as RecordRepository;
 use Iresults\Core as Iresults;
@@ -66,6 +67,13 @@ class RecordController extends \TYPO3\Flow\Mvc\Controller\ActionController {
 	protected $addedTasks = array();
 
 	/**
+	 * The array of date objects with their records.
+	 *
+	 * @var array<\Cundd\TimeOverview\Domain\Model\Date>
+	 */
+	protected $dates = array();
+
+	/**
 	 * action list
 	 *
 	 * @return void
@@ -90,7 +98,53 @@ class RecordController extends \TYPO3\Flow\Mvc\Controller\ActionController {
 		$records = $this->recordRepository->findByCalendarModeAndDate($calendarMode, $date);
 
 		\Iresults::pd($records);
+
+		$dates = $this->assignRecordsToDates($records);
+		$this->view->assign('dates', $dates);
 		$this->view->assign('records', $records);
+
+
+		$calendarModes = array(
+			'CALENDAR_MODE_YEAR' 	=> 'Year',
+			'CALENDAR_MODE_MONTH' 	=> 'Month',
+			'CALENDAR_MODE_WEEK' 	=> 'Week',
+			'CALENDAR_MODE_DAY' 	=> 'Day',
+		);
+		$this->view->assign('date', $date->format('Y-m-d'));
+		$this->view->assign('calendarMode', $calendarMode);
+		$this->view->assign('calendarModes', $calendarModes);
+
+		\Iresults::pd($this->settings['hoursPerWorkingDay']);
+	}
+
+	/**
+	 * Assignes records to it's date.
+	 *
+	 * @param  \TYPO3\Flow\Persistence\QueryResultInterface $records The records
+	 * @return array<\Cundd\TimeOverview\Domain\Model\Date>
+	 */
+	public function assignRecordsToDates($records) {
+		$recordsArray = $records->toArray();
+		#$this->dates
+		foreach ($recordsArray as $record) {
+			$currentDateRecord = NULL;
+			$startDate = $record->getStart();
+			$dateKey = $startDate->format('Y-m-d');
+
+			if (isset($this->dates[$dateKey])) {
+				$currentDateRecord = $this->dates[$dateKey];
+			} else {
+				$startDateString = $startDate->format('Y-m-d') . ' 00:00:00 +0000';
+				#$dateObjectDate = \new DateTime($startDateString);
+				$currentDateRecord = new Date();
+				$currentDateRecord->setDate(new \DateTime($startDateString));
+				$currentDateRecord->setHoursPerWorkingDay($this->settings['hoursPerWorkingDay']);
+				$this->dates[$dateKey] = $currentDateRecord;
+			}
+
+			$currentDateRecord->addRecord($record);
+		}
+		return $this->dates;
 	}
 
 	/**

@@ -8,175 +8,239 @@ namespace Cundd\TimeOverview\Domain\Model;
 
 use TYPO3\Flow\Annotations as Flow;
 use Doctrine\ORM\Mapping as ORM;
+use Cundd\TimeOverview\Domain\Model\Record as Record;
+use Cundd\TimeOverview\Domain\Model\SpecialRecord as SpecialRecord;
 
 /**
- * A time record
- *
- * @Flow\Entity
+ * A Date
  */
-class Record {
+class Date {
 
 	/**
-	 * Start
-	 *
+	 * The date
 	 * @var \DateTime
-	 * @Flow\Validate(type="NotEmpty")
 	 */
-	protected $start;
+	protected $date;
 
 	/**
-	 * End
-	 *
-	 * @var \DateTime
-	 * @Flow\Validate(type="NotEmpty")
+	 * The records
+	 * @var \SplObjectStorage<\Cundd\TimeOverview\Domain\Model\Record>
 	 */
-	protected $end;
+	protected $records;
 
 	/**
-	 * Comment
-	 *
-	 * @var string
+	 * The special records
+	 * @var \SplObjectStorage<\Cundd\TimeOverview\Domain\Model\SpecialRecord>
 	 */
-	protected $comment;
+	protected $specialRecords;
 
 	/**
-	 * Person
-	 *
-	 * @var \Cundd\TimeOverview\Domain\Model\Person
-	 * @ORM\ManyToOne(inversedBy="records")
+	 * The hours per working day (should)
+	 * @var float
+	 * @Flow\Transient
 	 */
-	protected $person;
+	protected $hoursPerWorkingDay = 0.0;
 
 	/**
-	 * Task
-	 *
-	 * @var \Cundd\TimeOverview\Domain\Model\Task
-	 * @ORM\ManyToOne(inversedBy="records",cascade={"persist"})
+	 * The seconds worked (is)
+	 * @var float
+	 * @Flow\Transient
 	 */
-	protected $task;
+	protected $workedSeconds = NULL;
+
+
 
 	/**
-	 * Returns the start
+	 * __construct
 	 *
-	 * @return \DateTime $start
-	 */
-	public function getStart() {
-		return $this->start;
-	}
-
-	/**
-	 * Sets the start
-	 *
-	 * @param \DateTime $start
 	 * @return void
 	 */
-	public function setStart($start) {
-		$this->start = $start;
+	public function __construct() {
+		//Do not remove the next line: It would break the functionality
+		$this->initStorageObjects();
 	}
 
 	/**
-	 * Returns the end
+	 * Initializes all \Doctrine\Common\Collections\ArrayCollection properties.
 	 *
-	 * @return \DateTime $end
-	 */
-	public function getEnd() {
-		return $this->end;
-	}
-
-	/**
-	 * Sets the end
-	 *
-	 * @param \DateTime $end
 	 * @return void
 	 */
-	public function setEnd($end) {
-		$this->end = $end;
+	protected function initStorageObjects() {
+		$this->records = new \Doctrine\Common\Collections\ArrayCollection();
+		$this->specialRecords = new \Doctrine\Common\Collections\ArrayCollection();
 	}
 
 	/**
-	 * Returns the comment
+	 * Get the Date's date
 	 *
-	 * @return string $comment
+	 * @return \DateTime The Date's date
 	 */
-	public function getComment() {
-		return $this->comment;
+	public function getDate() {
+		$this->workedSeconds = NULL;
+		return $this->date;
 	}
 
 	/**
-	 * Sets the comment
+	 * Sets this Date's date
 	 *
-	 * @param string $comment
+	 * @param \DateTime $date The Date's date
 	 * @return void
 	 */
-	public function setComment($comment) {
-		$this->comment = $comment;
+	public function setDate($date) {
+		$this->date = $date;
 	}
 
 	/**
-	 * Returns the person
+	 * Adds a Record
 	 *
-	 * @return \Cundd\TimeOverview\Domain\Model\Person $person
-	 */
-	public function getPerson() {
-		return $this->person;
-	}
-
-	/**
-	 * Sets the person
-	 *
-	 * @param \Cundd\TimeOverview\Domain\Model\Person $person
+	 * @param \Cundd\TimeOverview\Domain\Model\Record $record
 	 * @return void
 	 */
-	public function setPerson(Person $person) {
-		$this->person = $person;
+	public function addRecord(Record $record) {
+		$this->workedSeconds = NULL;
+		$this->records->add($record);
 	}
 
 	/**
-	 * Returns the task
+	 * Removes a Record
 	 *
-	 * @return \Cundd\TimeOverview\Domain\Model\Task $task
-	 */
-	public function getTask() {
-		return $this->task;
-	}
-
-	/**
-	 * Sets the task
-	 *
-	 * @param \Cundd\TimeOverview\Domain\Model\Task $task
+	 * @param \Cundd\TimeOverview\Domain\Model\Record $recordToRemove The Record to be removed
 	 * @return void
 	 */
-	public function setTask(Task $task) {
-		$this->task = $task;
+	public function removeRecord(Record $recordToRemove) {
+		$this->workedSeconds = NULL;
+		$this->records->removeElement($recordToRemove);
 	}
 
 	/**
-	 * Returns the duration
+	 * Get the Date's records
 	 *
-	 * @return \DateInterval Returns the time interval or FALSE on error
+	 * @return \SplObjectStorage<\Cundd\TimeOverview\Domain\Model\Record> The Date's records
 	 */
-	public function getDuration() {
-		$start = $this->getStart();
-		$end = $this->getEnd();
-		if (!$start || !$end) {
-			return FALSE;
+	public function getRecords() {
+		return $this->records;
+	}
+
+	/**
+	 * Sets this Date's records
+	 *
+	 * @param \SplObjectStorage<\Cundd\TimeOverview\Domain\Model\Record> $records The Date's records
+	 * @return void
+	 */
+	public function setRecords(\SplObjectStorage $records) {
+		$this->workedSeconds = NULL;
+		$this->records = $records;
+	}
+
+	/**
+	 * Adds a Record
+	 *
+	 * @param \Cundd\TimeOverview\Domain\Model\Record $record
+	 * @return void
+	 */
+	public function addSpecialRecord(SpecialRecord $record) {
+		$this->specialRecords->add($record);
+	}
+
+	/**
+	 * Removes a Record
+	 *
+	 * @param \Cundd\TimeOverview\Domain\Model\Record $recordToRemove The Record to be removed
+	 * @return void
+	 */
+	public function removeSpecialRecords(SpecialRecord $recordToRemove) {
+		$this->specialRecords->removeElement($recordToRemove);
+	}
+
+	/**
+	 * Get the Date's special records
+	 *
+	 * @return \SplObjectStorage<\Cundd\TimeOverview\Domain\Model\SpecialRecord> The Date's special records
+	 */
+	public function getSpecialRecords() {
+		return $this->specialRecords;
+	}
+
+	/**
+	 * Sets this Date's special records
+	 *
+	 * @param \SplObjectStorage<\Cundd\TimeOverview\Domain\Model\SpecialRecord> $specialRecords The Date's special records
+	 * @return void
+	 */
+	public function setSpecialRecords(\SplObjectStorage $specialRecords) {
+		$this->specialRecords = $specialRecords;
+	}
+
+	/**
+	 * Returns the hours per working day
+	 *
+	 * @return float
+	 */
+	public function getHoursPerWorkingDay() {
+		return $this->hoursPerWorkingDay;
+	}
+
+	/**
+	 * Set the hours per working day
+	 *
+	 * @param float $hoursPerWorkingDay
+	 */
+	public function setHoursPerWorkingDay($hoursPerWorkingDay) {
+		$this->hoursPerWorkingDay = $hoursPerWorkingDay;
+	}
+
+	/**
+	 * Returns the hours per working day
+	 *
+	 * @return float
+	 */
+	public function getSecondsPerWorkingDay() {
+		return $this->hoursPerWorkingDay * 60 * 60;
+	}
+
+	/**
+	 * Returns the seconds worked this day
+	 *
+	 * @return float
+	 */
+	public function getWorkedSeconds() {
+		if ($this->workedSeconds === NULL) {
+			$records = $this->getRecords();
+			foreach ($records as $record) {
+				$this->workedSeconds += $record->getDurationInSeconds();
+			}
 		}
-		return $end->diff($start);
+		return $this->workedSeconds;
 	}
 
 	/**
-	 * Returns the formatted duration
+	 * Returns the hours worked this day
 	 *
-	 * @return string
+	 * @return float
 	 */
-	public function getFormattedDuration() {
-		$duration = $this->getDuration();
-		if ($duration) {
-			return $duration->format('%hh %Imin');
-		}
-		return '';
+	public function getWorkedHours() {
+		return $this->getWorkedSeconds() / 60 / 60;
 	}
 
+	/**
+	 * Returns the difference between the hours per working day and the worked
+	 * hours (should - is).
+	 *
+	 * @return integer Difference in seconds
+	 */
+	public function getDifferenceInSeconds() {
+		return $this->getSecondsPerWorkingDay() - $this->getWorkedSeconds();
+	}
+
+	/**
+	 * Returns the difference between the hours per working day and the worked
+	 * hours (should - is).
+	 *
+	 * @return integer Difference in hours
+	 */
+	public function getDifferenceInHours() {
+		return $this->getDifferenceInSeconds() / 60 / 60;
+	}
 
 
 }

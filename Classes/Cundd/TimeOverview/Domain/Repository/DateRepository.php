@@ -9,11 +9,13 @@ namespace Cundd\TimeOverview\Domain\Repository;
 use TYPO3\Flow\Annotations as Flow;
 
 /**
- * Standard controller for the Cundd.TimeOverview package
+ * A repository for Dates
  *
  * @Flow\Scope("singleton")
  */
-class SpecialRecordRepository extends RecordRepository {
+class DateRepository extends \TYPO3\Flow\Persistence\Repository {
+
+	// add customized methods here
 
 }
 ?>

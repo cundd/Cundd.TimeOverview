@@ -177,6 +177,20 @@ class Record {
 		return '';
 	}
 
+	/**
+	 * Returns the duration in seconds
+	 *
+	 * @return integer Returns the time interval or FALSE on error
+	 */
+	public function getDurationInSeconds() {
+		$start = $this->getStart()->getTimestamp();
+		$end = $this->getEnd()->getTimestamp();
+		if (!$start || !$end) {
+			return FALSE;
+		}
+		return $end - $start;
+	}
+
 
 
 }
