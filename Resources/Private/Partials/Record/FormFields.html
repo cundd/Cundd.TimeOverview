@@ -1,0 +1,12 @@
+<label for="start">
+	<f:translate id="tx_cunddtimeoverview_domain_model_record.start" /> <span class="required">(required)</span>
+</label><br />
+	<f:form.textfield property="start"  value="{record.start->f:format.date()}" /><br />
+<label for="end">
+	<f:translate id="tx_cunddtimeoverview_domain_model_record.end" /> <span class="required">(required)</span>
+</label><br />
+	<f:form.textfield property="end"  value="{record.end->f:format.date()}" /><br />
+<label for="comment">
+	<f:translate id="tx_cunddtimeoverview_domain_model_record.comment" />
+</label><br />
+	<f:form.textarea property="comment" cols="40" rows="15" /><br />

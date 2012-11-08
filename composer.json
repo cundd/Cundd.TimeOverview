@@ -1,0 +1,20 @@
+{
+	"name": "cundd\/timeoverview",
+	"type": "typo3-flow-package",
+	"description": "Get an overview of your work time",
+	"repositories": [
+        {
+			"type": "vcs",
+			"url": "http://git.iresults.me/Cundd.SiteBoilerplate.git"
+		}
+	],
+	"require": {
+		"typo3\/flow": "*",
+		"cundd\/siteboilerplate": "*"
+	},
+	"autoload": {
+		"psr-0": {
+			"Cundd\\TimeOverview": "Classes"
+		}
+	}
+}

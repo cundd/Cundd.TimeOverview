@@ -1,0 +1,45 @@
+<f:layout name="Default" />
+{namespace ir=Iresults\Core\ViewHelpers}
+
+This Template is responsible for creating a table of domain objects.
+
+If you modify this template, do not forget to change the overwrite settings
+in /Configuration/ExtensionBuilder/settings.yaml:
+  Resources:
+    Private:
+      Templates:
+        List.html: keep
+
+Otherwise your changes will be overwritten the next time you save the extension in the extension builder
+
+<f:section name="main">
+<h1>Listing for Record</h1>
+
+<f:flashMessages />
+
+<table class="tx_cunddtimeoverview table table-striped table-condensed">
+	<tr>
+		<th><f:translate>Start</f:translate></th>
+		<th><f:translate>End</f:translate></th>
+		<th><f:translate>Duration</f:translate></th>
+		<th><f:translate>Comment</f:translate></th>
+		<th><f:translate>Project title</f:translate></th>
+		<th> </th>
+		<th> </th>
+	</tr>
+
+	<f:for each="{records}" as="record">
+		<tr>
+			<td><f:link.action action="show" arguments="{record : record}"> <f:format.date format="Y-m-d H:i">{record.start}</f:format.date></f:link.action></td>
+			<td><f:link.action action="show" arguments="{record : record}"> <f:format.date format="Y-m-d H:i">{record.end}</f:format.date></f:link.action></td>
+			<td><f:link.action action="show" arguments="{record : record}"> {record.formattedDuration}</f:link.action></td>
+			<td><f:link.action action="show" arguments="{record : record}"> {record.comment}</f:link.action></td>
+			<td><f:link.action action="show" controller="project" arguments="{project : record.task.project}"> {record.task.project.title}</f:link.action></td>
+			<td><f:link.action action="edit" arguments="{record : record}">Edit</f:link.action></td>
+			<td><f:link.action action="delete" arguments="{record : record}">Delete</f:link.action></td>
+		</tr>
+	</f:for>
+</table>
+
+<f:link.action action="new">New Record</f:link.action>
+</f:section>

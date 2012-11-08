@@ -1,0 +1,14 @@
+plugin.tx_cunddtimeoverview {
+	view {
+		# cat=plugin.tx_cunddtimeoverview/file; type=string; label=Path to template root (FE)
+		templateRootPath = EXT:cundd_time_overview/Resources/Private/Templates/
+		# cat=plugin.tx_cunddtimeoverview/file; type=string; label=Path to template partials (FE)
+		partialRootPath = EXT:cundd_time_overview/Resources/Private/Partials/
+		# cat=plugin.tx_cunddtimeoverview/file; type=string; label=Path to template layouts (FE)
+		layoutRootPath = EXT:cundd_time_overview/Resources/Private/Layouts/
+	}
+	persistence {
+		# cat=plugin.tx_cunddtimeoverview//a; type=string; label=Default storage PID
+		storagePid = 
+	}
+}

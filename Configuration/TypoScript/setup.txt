@@ -1,0 +1,34 @@
+plugin.tx_cunddtimeoverview {
+	view {
+		templateRootPath = {$plugin.tx_cunddtimeoverview.view.templateRootPath}
+		partialRootPath = {$plugin.tx_cunddtimeoverview.view.partialRootPath}
+		layoutRootPath = {$plugin.tx_cunddtimeoverview.view.layoutRootPath}
+	}
+	persistence {
+		storagePid = {$plugin.tx_cunddtimeoverview.persistence.storagePid}
+	}
+	features {
+		# uncomment the following line to enable the new Property Mapper.
+		# rewrittenPropertyMapper = 1
+	}
+}
+
+plugin.tx_cunddtimeoverview._CSS_DEFAULT_STYLE (
+	input.f3-form-error {
+		background-color:#FF9F9F;
+		border: 1px #FF0000 solid;
+	}
+
+	.tx-cundd-time-overview table {
+		border-collapse:separate;
+		border-spacing:10px;
+	}
+
+	.tx-cundd-time-overview table th {
+		font-weight:bold;
+	}
+
+	.tx-cundd-time-overview table td {
+		vertical-align:top;
+	}
+)

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="messages" date="2012-11-45T14:39:45Z" product-name="cundd_time_overview">
+		<header/>
+		<body>
+
+			<trans-unit id="title.description">
+				<source>Title</source>
+			</trans-unit>
+			<trans-unit id="recurring.description">
+				<source>Recurring</source>
+			</trans-unit>
+			<trans-unit id="comment.description">
+				<source>Comment</source>
+			</trans-unit>
+			<trans-unit id="start.description">
+				<source>Start</source>
+			</trans-unit>
+			<trans-unit id="end.description">
+				<source>End</source>
+			</trans-unit>
+			<trans-unit id="person.description">
+				<source>Person</source>
+			</trans-unit>
+			<trans-unit id="task.description">
+				<source>Task</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>		<html class="lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>			<html class="lt-ie9 lt-ie8 ie7 ie v7"> <![endif]-->
+<!--[if IE 8]>			<html class="lt-ie9 ie8 ie v8"> <![endif]-->
+<!--[if IE 9]>			<html class="lt-ie10 ie9 ie v9"> <![endif]-->
+<!--[if IE 10]>			<html class="ie10 ie v10"> <![endif]-->
+<!--[if gt IE 10]><!--> <html class=""> <!--<![endif]-->
+	<head>
+		<title>{data.title}</title>
+
+		<f:base></f:base>
+
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	
+		<link rel="stylesheet" href="{f:uri.resource(path:'Stylesheets/Css/page.css', package:'Cundd.SiteBoilerplate')}" type="text/css" media="all"> 
+
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- View port for responsive design -->
+	</head>
+	<body>
+		<div class="before_main"></div>
+		<div id="main_container" class="container">
+			<div id="main">
+				<!--[if lt IE 7]>
+					<div class="cundd_old_browser_container">
+						<div class="cundd_old_browser">
+							<p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
+						</div>
+					</div>
+				<![endif]-->
+				<noscript>
+					<div class="cundd_javascript_disabled_container">
+						<div class="cundd_javascript_disabled">
+							<p>EN: Please enable JavaScript in your browser.</p>
+							<p>DE: Bitte aktivieren Sie JavaScript in Ihrem Browser.</p>
+							<p>FR: S'il vous plaît activer JavaScript dans votre navigateur.</p>
+						</div>
+					</div>
+				</noscript>
+
+				<header>
+					<div class="top header">
+						{headerTop}
+					</div>
+
+					<nav class="main-nav">
+						{navigation}
+					</nav>
+				</header>
+
+				<div class="teaser">
+					{teaser}
+				</div>
+
+				<div class="content row-fluid">
+					<section class="span12">
+						<f:render section="main" />
+					</section>
+				</div>
+
+				<footer>
+					{footer}
+				</footer>
+			</div>
+		</div>
+		<div class="after_main"></div>
+	</body>
+</html>
