@@ -28,7 +28,7 @@ class Person {
 	 * Special time records
 	 *
 	 * @var \Doctrine\Common\Collections\Collection<\Cundd\TimeOverview\Domain\Model\SpecialRecord>
-	 * @ORM\ManyToMany(inversedBy="person")
+	 * @   ORM\ManyToMany(inversedBy="person")
 	 */
 	protected $specialRecords;
 

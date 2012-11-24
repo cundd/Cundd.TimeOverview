@@ -13,8 +13,15 @@ use Doctrine\ORM\Mapping as ORM;
  * A time record
  *
  * @Flow\Entity
+ *
+ * @ORM\InheritanceType("SINGLE_TABLE")
+ * @ORM\DiscriminatorColumn(name="record_type", type="string")
+ * @ORM\DiscriminatorMap({"standard_record"="Record", "special_record"="SpecialRecord"})
  */
 class Record {
+	const RECORD_TYPE = 'RECORD_TYPE';
+	const RECORD_TYPE_STANDARD = 'RECORD_TYPE_STANDARD';
+	const RECORD_TYPE_SPECIAL = 'RECORD_TYPE_SPECIAL';
 
 	/**
 	 * Start

@@ -1,20 +1,20 @@
 <label for="title">
-	<f:translate key="tx_cunddtimeoverview_domain_model_specialrecord.title" /> <span class="required">(required)</span>
+	<f:translate>Title</f:translate> <span class="required">(required)</span>
 </label><br />
 	<f:form.textfield property="title" /><br />
 <label for="recurring">
-	<f:translate key="tx_cunddtimeoverview_domain_model_specialrecord.recurring" />
+	<f:translate>Recurring</f:translate>
 </label><br />
 	<f:form.textfield property="recurring" /><br />
 <label for="comment">
-	<f:translate key="tx_cunddtimeoverview_domain_model_specialrecord.comment" />
+	<f:translate>Comment</f:translate>
 </label><br />
 	<f:form.textarea property="comment" cols="40" rows="15" /><br />
 <label for="start">
-	<f:translate key="tx_cunddtimeoverview_domain_model_specialrecord.start" /> <span class="required">(required)</span>
+	<f:translate>Start</f:translate> <span class="required">(required)</span>
 </label><br />
 	<f:form.textfield property="start"  value="{specialRecord.start->f:format.date()}" /><br />
 <label for="end">
-	<f:translate key="tx_cunddtimeoverview_domain_model_specialrecord.end" />
+	<f:translate>End</f:translate>
 </label><br />
 	<f:form.textfield property="end"  value="{specialRecord.end->f:format.date()}" /><br />

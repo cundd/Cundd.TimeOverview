@@ -47,43 +47,95 @@ Otherwise your changes will be overwritten the next time you save the extension 
 
 
 <table class="tx_cunddtimeoverview table table-striped table-condensed">
-	<tr>
-		<th><f:translate>Date</f:translate></th>
-		<th><f:translate>Records</f:translate></th>
-	</tr>
+	<thead>
+		<tr>
+			<th><f:translate>Date</f:translate></th>
+			<th><f:translate>Records</f:translate></th>
+		</tr>
+	</thead>
 
-	<f:for each="{dates}" as="currentDate">
+	<tbody>
+		<f:for each="{dates}" as="currentDate">
+			<tr>
+				<td>
+					<f:link.action action="calendar" arguments="{date : currentDate.date.timestamp}"> <f:format.date format="D Y-m-d">{currentDate.date}</f:format.date></f:link.action> <br />
+
+					<f:format.number>{currentDate.isInHours}</f:format.number> of <f:format.number>{currentDate.shouldInHours}</f:format.number>
+
+
+					{currentDate.differenceAsFormattedDateInterval}<br />
+
+					<f:if condition="{currentDate.differenceInPercent} > 100">
+						<f:then>
+							<div class="progress progress-success">
+								<div class="bar" style="width: {currentDate.differenceInPercent}%"></div>
+							</div>
+						</f:then>
+
+						<f:else>
+							<div class="progress progress-danger">
+								<div class="bar" style="width: {currentDate.differenceInPercent}%"></div>
+							</div>
+						</f:else>
+					</f:if>
+				</td>
+				<td>
+					Number of records: <f:count>{currentDate.records}</f:count>
+
+					<table class="table table-hover table-condensed">
+						<tr>
+							<th><f:translate>Start</f:translate></th>
+							<th><f:translate>End</f:translate></th>
+							<th><f:translate>Duration</f:translate></th>
+							<th><f:translate>Comment</f:translate></th>
+							<th><f:translate>Project title</f:translate></th>
+						</tr>
+
+						<f:for each="{currentDate.records}" as="record">
+							<tr>
+								<td><f:link.action action="show" arguments="{record : record}"> <f:format.date format="Y-m-d H:i">{record.start}</f:format.date></f:link.action></td>
+								<td><f:link.action action="show" arguments="{record : record}"> <f:format.date format="Y-m-d H:i">{record.end}</f:format.date></f:link.action></td>
+								<td><f:link.action action="show" arguments="{record : record}"> {record.formattedDuration}</f:link.action></td>
+								<td><f:link.action action="show" arguments="{record : record}"> {record.comment}</f:link.action></td>
+								<td><f:link.action action="show" controller="project" arguments="{project : record.task.project}"> {record.task.project.title}</f:link.action></td>
+							</tr>
+						</f:for>
+					</table>
+
+				</td>
+			</tr>
+		</f:for>
+	</tbody>
+
+	<tfoot>
 		<tr>
 			<td>
-				<f:link.action action="calendar" arguments="{date : currentDate.date.timestamp}">
-					<f:format.date format="Y-m-d">{currentDate.date}</f:format.date>
-				</f:link.action>
+				{totalDifferenceHours} <br />
+				{totalDifferenceFormatted}<br />
+				<f:format.number>{totalActualHours}</f:format.number> of <f:format.number>{totalTargetHours}</f:format.number>
+
+
+				<f:if condition="{totalDifferenceInPercent} > 100">
+					<f:then>
+						<div class="progress progress-success">
+							<div class="bar" style="width: {totalDifferenceInPercent}%"></div>
+						</div>
+					</f:then>
+
+					<f:else>
+						<div class="progress progress-danger">
+							<div class="bar" style="width: {totalDifferenceInPercent}%"></div>
+						</div>
+					</f:else>
+				</f:if>
 			</td>
 			<td>
-				<table class="table table-hover table-condensed">
-					<tr>
-						<th><f:translate>Start</f:translate></th>
-						<th><f:translate>End</f:translate></th>
-						<th><f:translate>Duration</f:translate></th>
-						<th><f:translate>Comment</f:translate></th>
-						<th><f:translate>Project title</f:translate></th>
-					</tr>
-
-					<f:for each="{records}" as="record">
-						<tr>
-							<td><f:link.action action="show" arguments="{record : record}"> <f:format.date format="Y-m-d H:i">{record.start}</f:format.date></f:link.action></td>
-							<td><f:link.action action="show" arguments="{record : record}"> <f:format.date format="Y-m-d H:i">{record.end}</f:format.date></f:link.action></td>
-							<td><f:link.action action="show" arguments="{record : record}"> {record.formattedDuration}</f:link.action></td>
-							<td><f:link.action action="show" arguments="{record : record}"> {record.comment}</f:link.action></td>
-							<td><f:link.action action="show" controller="project" arguments="{project : record.task.project}"> {record.task.project.title}</f:link.action></td>
-						</tr>
-					</f:for>
-
-				</table>
+				Total number of records: <f:count>{records}</f:count>
 			</td>
 		</tr>
-	</f:for>
+	</tfoot>
 </table>
+
 
 
 <f:form action="calendar" method="post">

@@ -85,6 +85,29 @@ class RecordRepository extends \TYPO3\Flow\Persistence\Repository {
 	}
 
 	/**
+	 * Returns if the record exists in the repository.
+	 *
+	 * @param \Cundd\TimeOverview\Domain\Model\Record   $record The record to look for
+	 * @return boolean
+	 */
+	public function hasRecord($record) {
+		$query = $this->createQuery();
+
+		$query->matching(
+            $query->logicalAnd(
+                $query->equals('start', 	$record->getStart()),
+                $query->equals('end', 		$record->getEnd()),
+                $query->equals('task', 		$record->getTask())
+            )
+        );
+		return $query->count() > 0 ? TRUE : FALSE;
+
+		return $query->matching($query->equals($propertyName, $arguments[0], $caseSensitive))->count();
+
+		$this->recordRepository->hasRecordWithTaskAndStartAndEndDate();
+	}
+
+	/**
 	 * Returns the start and end date for the given calendar mode and date
 	 *
 	 * @param  string|CALENDAR_MODE 	$calendarMode The calendar mode to display records of a single day, week, month or year

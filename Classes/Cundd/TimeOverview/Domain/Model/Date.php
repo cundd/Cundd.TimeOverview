@@ -48,6 +48,13 @@ class Date {
 	 */
 	protected $workedSeconds = NULL;
 
+	/**
+	 * The total seconds of special records
+	 * @var float
+	 * @Flow\Transient
+	 */
+	protected $specialRecordsTotalSeconds = NULL;
+
 
 
 	/**
@@ -172,6 +179,38 @@ class Date {
 	}
 
 	/**
+	 * Returns the time that should be.
+	 * @return integer
+	 */
+	public function getShouldInSeconds() {
+		return $this->getSecondsPerWorkingDay() - $this->getSpecialRecordsTotalInSeconds();
+	}
+
+	/**
+	 * Returns the time that should be.
+	 * @return float
+	 */
+	public function getShouldInHours() {
+		return $this->getShouldInSeconds() / 60 / 60;
+	}
+
+	/**
+	 * Returns the time that is worked.
+	 * @return integer
+	 */
+	public function getIsInSeconds() {
+		return $this->getWorkedSeconds();
+	}
+
+	/**
+	 * Returns the time that is worked.
+	 * @return float
+	 */
+	public function getIsInHours() {
+		return $this->getWorkedHours();
+	}
+
+	/**
 	 * Returns the hours per working day
 	 *
 	 * @return float
@@ -201,7 +240,7 @@ class Date {
 	/**
 	 * Returns the seconds worked this day
 	 *
-	 * @return float
+	 * @return integer
 	 */
 	public function getWorkedSeconds() {
 		if ($this->workedSeconds === NULL) {
@@ -223,23 +262,81 @@ class Date {
 	}
 
 	/**
-	 * Returns the difference between the hours per working day and the worked
-	 * hours (should - is).
+	 * Returns the total seconds of special records
+	 *
+	 * @return integer
+	 */
+	public function getSpecialRecordsTotalInSeconds() {
+		if ($this->specialRecordsTotalSeconds === NULL) {
+			$records = $this->getSpecialRecords();
+			foreach ($records as $record) {
+				$this->specialRecordsTotalSeconds += $record->getDurationInSeconds();
+			}
+		}
+		return $this->specialRecordsTotalSeconds;
+	}
+
+	/**
+	 * Returns the total hours of special records
+	 *
+	 * @return integer
+	 */
+	public function getSpecialRecordsTotalInHours() {
+		return $this->getSpecialRecordsTotalInSeconds() / 60 / 60;
+	}
+
+	/**
+	 * Returns the difference between the actual worked seconds and the seconds
+	 * that should be (is - should).
 	 *
 	 * @return integer Difference in seconds
 	 */
 	public function getDifferenceInSeconds() {
-		return $this->getSecondsPerWorkingDay() - $this->getWorkedSeconds();
+		return $this->getWorkedSeconds() - $this->getShouldInSeconds();
 	}
 
 	/**
 	 * Returns the difference between the hours per working day and the worked
 	 * hours (should - is).
 	 *
-	 * @return integer Difference in hours
+	 * @return float Difference in hours
 	 */
 	public function getDifferenceInHours() {
 		return $this->getDifferenceInSeconds() / 60 / 60;
+	}
+
+	/**
+	 * Returns the difference between the hours per working day and the worked
+	 * hours (should - is).
+	 *
+	 * @return float Difference in percent
+	 */
+	public function getDifferenceInPercent() {
+		if (!$this->getSecondsPerWorkingDay() || !$this->getWorkedSeconds()) {
+			return FALSE;
+		}
+		return $this->getWorkedSeconds() / $this->getSecondsPerWorkingDay() * 100;
+	}
+
+	/**
+	 * Returns the difference between the hours per working day and the worked
+	 * hours (should - is).
+	 *
+	 * @return string
+	 */
+	public function getDifferenceAsFormattedDateInterval() {
+		$date1 = new \DateTime();
+		$date2 = new \DateTime();
+		$difference = $this->getDifferenceInSeconds();
+
+		$date2->add(new \DateInterval('PT' . abs($difference) . 'S'));
+
+		$duration = $date2->diff($date1);
+		$output = '';
+		if ($difference < 0) {
+			$output .= '-';
+		}
+		return $output . $duration->format('%hh %Imin');
 	}
 
 
