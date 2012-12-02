@@ -9,8 +9,10 @@ namespace Cundd\TimeOverview\Controller;
 use TYPO3\Flow\Annotations as Flow;
 use \Cundd\TimeOverview\Domain\Model\SpecialRecord as SpecialRecord;
 
+ini_set('display_errors', TRUE);
+
 /**
- * Standard controller for the Cundd.TimeOverview package 
+ * Standard controller for the Cundd.TimeOverview package
  *
  * @Flow\Scope("singleton")
  */

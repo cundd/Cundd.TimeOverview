@@ -5,13 +5,16 @@ namespace Cundd\TimeOverview\Controller;
  * This script belongs to the TYPO3 Flow package "Cundd.TimeOverview".    *
  *                                                                        *
  *                                                                        */
-ini_set('display_errors', TRUE);
 use TYPO3\Flow\Annotations as Flow;
 use Cundd\TimeOverview\Domain\Model\Date as Date;
 use Cundd\TimeOverview\Domain\Model\Record as Record;
 use Cundd\TimeOverview\Domain\Repository\RecordRepository as RecordRepository;
 use Iresults\Core as Iresults;
 use Iresults\Core\Nil;
+use Iresults\Core\DateTime;
+
+ini_set('display_errors', TRUE);
+set_time_limit(0);
 
 /**
  * Standard controller for the Cundd.TimeOverview package
@@ -117,14 +120,20 @@ class RecordController extends \TYPO3\Flow\Mvc\Controller\ActionController {
 	 * @return 	void
 	 */
 	public function calendarAction($calendarMode = RecordRepository::CALENDAR_MODE_YEAR, $date = NULL) {
-		$date = new \DateTime($date);
+		if (!$date) {
+			$date = NULL;
+		}
+		$date = new DateTime($date);
+
+		\Iresults\Core\Iresults::pd('test');
+
 
 		$this->prepareDatesForCalendarModeAndDate($calendarMode, $date);
 		// $records = $this->recordRepository->findAll();
 		$records = $this->recordRepository->findByCalendarModeAndDate($calendarMode, $date);
 		$specialRecords = $this->specialRecordRepository->findByCalendarModeAndDate($calendarMode, $date);
 
-		\Iresults::pd($records);
+		\Iresults\Core\Iresults::pd($records);
 
 		$dates = $this->assignRecordsToDates($records);
 		$dates = $this->assignRecordsToDates($specialRecords);
@@ -142,10 +151,10 @@ class RecordController extends \TYPO3\Flow\Mvc\Controller\ActionController {
 		$this->view->assign('calendarMode', $calendarMode);
 		$this->view->assign('calendarModes', $calendarModes);
 
+		$this->collectTotals();
 
 
-
-		\Iresults::pd($this->settings['hoursPerWorkingDay']);
+		\Iresults\Core\Iresults::pd($this->settings['hoursPerWorkingDay']);
 	}
 
 	/**
@@ -153,15 +162,32 @@ class RecordController extends \TYPO3\Flow\Mvc\Controller\ActionController {
 	 * @return void
 	 */
 	public function collectTotals() {
-		\Iresults::pd('totalTargetHoursLocal: ' . $this->totalTargetHours);
-		\Iresults::pd('totalActualHoursLocal: ' . $this->totalActualHours);
+		$totalTargetHoursLocal = 0;
+		$totalActualHoursLocal = 0;
+		$totalDifferenceHoursLocal = 0;
+
+		$dates = $this->dates;
+
+		// Calculate the results
+		foreach ($dates as $date) {
+			$totalActualHoursLocal += $date->getIsInHours();
+			$totalTargetHoursLocal += $date->getShouldInHours();
+		}
+
+		$this->totalTargetHours = $totalTargetHoursLocal;
+		$this->totalActualHours = $totalActualHoursLocal;
+		$this->totalDifferenceHours = $totalActualHoursLocal - $totalTargetHoursLocal;
+
+		\Iresults\Core\Iresults::pd('totalTargetHoursLocal: ' . $this->totalTargetHours);
+		\Iresults\Core\Iresults::pd('totalActualHoursLocal: ' . $this->totalActualHours);
+
 
 		$this->view->assign('totalTargetHours', $this->totalTargetHours);
 		$this->view->assign('totalActualHours', $this->totalActualHours);
 		$this->view->assign('totalDifferenceHours', $this->totalDifferenceHours);
 
-		$this->totalActualHours = $this->totalActualHours ? $this->totalActualHours : 1;
-		$totalDifferenceInPercent = $this->totalTargetHours / $this->totalActualHours * 100;
+		$divisor = $this->totalActualHours ? $this->totalActualHours : 1;
+		$totalDifferenceInPercent = $this->totalTargetHours / $divisor * 100;
 		$this->view->assign('totalDifferenceInPercent', $totalDifferenceInPercent);
 		$this->view->assign('totalDifferenceFormatted', $this->getTotalDifferenceFormatted());
 
@@ -172,8 +198,8 @@ class RecordController extends \TYPO3\Flow\Mvc\Controller\ActionController {
 	 * @return string
 	 */
 	public function getTotalDifferenceFormatted() {
-		$date1 = new \DateTime();
-		$date2 = new \DateTime();
+		$date1 = new DateTime();
+		$date2 = new DateTime();
 		$difference = ($this->totalActualHours - $this->totalTargetHours) * 60 * 60;
 
 		$date2->add(new \DateInterval('PT' . abs($difference) . 'S'));
@@ -192,7 +218,7 @@ class RecordController extends \TYPO3\Flow\Mvc\Controller\ActionController {
 	 * and date.
 	 *
 	 * @param  string 		$calendarMode The calendar mode to display records of a single day, week, month or year
-	 * @param  \DateTime 	$date         A date that lies within the calendar mode period
+	 * @param  DateTime 	$date         A date that lies within the calendar mode period
 	 * @return array<\Cundd\TimeOverview\Domain\Model\Date>	Returns the prepared dates
 	 */
 	public function prepareDatesForCalendarModeAndDate($calendarMode, $date) {
@@ -209,7 +235,7 @@ class RecordController extends \TYPO3\Flow\Mvc\Controller\ActionController {
 
 		do {
 			$currentWorkingDateString = date('Y-m-d', $currentWorkingTimestamp);
-			$currentWorkingDateTime = new \DateTime($currentWorkingDateString . ' 00:00:00 +0000');
+			$currentWorkingDateTime = new DateTime($currentWorkingDateString . ' 00:00:00 +0000');
 
 			$currentWorkingDate = new Date();
 			$currentWorkingDate->setDate($currentWorkingDateTime);
@@ -222,7 +248,7 @@ class RecordController extends \TYPO3\Flow\Mvc\Controller\ActionController {
 			$tempDates[$currentWorkingDateString] = $currentWorkingDate;
 
 			// $v++;
-			// \Iresults::pd($currentWorkingTimestamp . ' vs. ' . $now . ' = now ' . ($now - $currentWorkingTimestamp));
+			// \Iresults\Core\Iresults::pd($currentWorkingTimestamp . ' vs. ' . $now . ' = now ' . ($now - $currentWorkingTimestamp));
 
 			$currentWorkingTimestamp += $oneDayInSeconds;
 		} while ($currentWorkingTimestamp < $now && $currentWorkingTimestamp < $endTimeStamp);
@@ -242,9 +268,6 @@ class RecordController extends \TYPO3\Flow\Mvc\Controller\ActionController {
 	 */
 	public function assignRecordsToDates($records, $recordType = NULL) {
 		$recordsArray = $records->toArray();
-		$totalTargetHoursLocal = $this->totalTargetHours;
-		$totalActualHoursLocal = $this->totalActualHours;
-		$totalDifferenceHoursLocal = $this->totalDifferenceHours;
 		$hoursPerWorkingDay = $this->settings['hoursPerWorkingDay'];
 
 		foreach ($recordsArray as $record) {
@@ -252,23 +275,14 @@ class RecordController extends \TYPO3\Flow\Mvc\Controller\ActionController {
 			$startDate = $record->getStart();
 			$dateKey = $startDate->format('Y-m-d');
 
+			// Check if the Date object exists
 			if (isset($this->dates[$dateKey])) {
 				$currentDateRecord = $this->dates[$dateKey];
 			} else {
 				throw new \UnexpectedValueException('The Date object for date ' . $dateKey . ' doesn\'t appear to have been created in prepareDatesForCalendarModeAndDate()', 1353757274);
-				// $startDateString = $startDate->format('Y-m-d') . ' 00:00:00 +0000';
-				// $startDateObject = new \DateTime($startDateString);
-				// $currentDateRecord = new Date();
-				// $currentDateRecord->setDate($startDateObject);
-
-				// $day = date('D', $startDateObject->getTimestamp());
-				// if ($day !== 'Sat' && $day !== 'Sun') {
-				// 	$currentDateRecord->setHoursPerWorkingDay($hoursPerWorkingDay);
-				// }
-				// $this->dates[$dateKey] = $currentDateRecord;
 			}
 
-			//RECORD_TYPE_STANDARD
+			// Detect the record type of the current record
 			$currentRecordType = NULL;
 			if ($recordType) {
 				$currentRecordType = $recordType;
@@ -281,20 +295,10 @@ class RecordController extends \TYPO3\Flow\Mvc\Controller\ActionController {
 			// Add it as standard or special record
 			if ($currentRecordType === Record::RECORD_TYPE_STANDARD) {
 				$currentDateRecord->addRecord($record);
-
-				// Calculate the time
-				$totalTargetHoursLocal += $hoursPerWorkingDay;
-				$totalActualHoursLocal += $currentDateRecord->getWorkedHours();
-				$totalDifferenceHoursLocal += $currentDateRecord->getDifferenceInHours();
 			} else if ($currentRecordType === Record::RECORD_TYPE_SPECIAL) {
 				$currentDateRecord->addSpecialRecord($record);
-				$totalTargetHoursLocal -= $record->getDurationInHourse();
 			}
 		}
-
-		$this->totalTargetHours = $totalTargetHoursLocal;
-		$this->totalActualHours = $totalActualHoursLocal;
-		// $this->totalDifferenceHours = $totalDifferenceHoursLocal;
 		return $this->dates;
 	}
 
@@ -319,7 +323,7 @@ class RecordController extends \TYPO3\Flow\Mvc\Controller\ActionController {
 		$timeRecords = array();
 		$timeRecord = NULL;
 
-		// $importFile = \Iresults::getBasePath() . 'Data/Time Tracker Data.csv';
+		// $importFile = \Iresults\Core\Iresults::getBasePath() . 'Data/Time Tracker Data.csv';
 		$dataGrid = new Iresults\Model\DataGrid();
 		$dataGrid->initWithContentsOfCSVFile($importFile, ';');
 
@@ -354,7 +358,7 @@ class RecordController extends \TYPO3\Flow\Mvc\Controller\ActionController {
 
 					case 'start':
 					case 'end':
-						$value = new Iresults\DateTime($value);
+						$value = new IresultsDateTime($value);
 						$value = $value->getRaw();
 						$preparedDictionary[$property] = $value;
 						break;

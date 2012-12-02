@@ -31,7 +31,7 @@ class ImportCommandController extends \TYPO3\Flow\Cli\CommandController {
 	 */
 	public function importCommand($file) {
 		if (!is_readable($file)) {
-			\Iresults::say($file . ': No such file or directory', \Iresults\Core\Command\ColorInterface::RED);
+			\Iresults\Core\Iresults::say($file . ': No such file or directory', \Iresults\Core\Iresults\Core\Command\ColorInterface::RED);
 			$this->sendAndExit(1);
 		}
 		$this->recordController->importFromFile($file);

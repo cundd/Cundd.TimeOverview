@@ -75,7 +75,7 @@ class RecordRepository extends \TYPO3\Flow\Persistence\Repository {
 
 		      // ->matching($query->lessThanOrEqual('end', $start->getTimestamp())); 		// The record's start must be lower than the end date
 
-		// \Iresults::pd(iterator_to_array($query->execute()));
+		// \Iresults\Core\Iresults::pd(iterator_to_array($query->execute()));
 		return $query->execute();
 
 		// $query->lessThanOrEqual('end', $end);
@@ -143,13 +143,13 @@ class RecordRepository extends \TYPO3\Flow\Persistence\Repository {
 
 		}
 
-		\Iresults::pd($date, $calendarMode, $date->format('Y'));
+		\Iresults\Core\Iresults::pd($date, $calendarMode, $date->format('Y'));
 
 		$start = new \DateTime($startDateString);
 		$end = new \DateTime($endDateString);
 
-		\Iresults::pd($start, $startDateString);
-		\Iresults::pd($end, $endDateString);
+		\Iresults\Core\Iresults::pd($start, $startDateString);
+		\Iresults\Core\Iresults::pd($end, $endDateString);
 		return array($start, $end);
 	}
 }
