@@ -45,6 +45,61 @@ Otherwise your changes will be overwritten the next time you save the extension 
 </f:comment>
 -->
 
+<style type="text/css">
+	.label {
+		margin-bottom: 4px;
+	}
+	.warning,
+	.warning .warning-inner {
+		/*width: 100%;*/
+		width: 25px;
+		height: 25px;
+	}
+
+	.warning {
+		background-color: #FF726D;
+	}
+	.warning {
+		background-color: #DE514C;
+		/*background: #aa0d00;*/
+
+		background-color: #DE514C;
+		background-image: -moz-linear-gradient(top, #EE5F5B, #C43C35);
+		background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#EE5F5B), to(#C43C35));
+		background-image: -webkit-linear-gradient(top, #EE5F5B, #C43C35);
+		background-image: -o-linear-gradient(top, #EE5F5B, #C43C35);
+		background-image: linear-gradient(to bottom, #EE5F5B, #C43C35);
+		background-repeat: repeat-x;
+		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFEE5F5B', endColorstr='#FFC43C35', GradientType=0);
+
+
+	}
+
+	.warning .warning-inner {
+		/*box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);*/
+		box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.8);
+		color: #fff;
+		text-align: center;
+		font-weight: bold;
+		font-size: 1.2em;
+	}
+
+	.time-data {
+		width: 80%;
+		float: left;
+	}
+	.time-warning {
+		width: 20%;
+		float:	right;
+	}
+	.time-percent {
+		clear: both;
+	}
+
+	.create-new-box {
+		float: right;
+	}
+</style>
 
 <table class="tx_cunddtimeoverview table table-striped table-condensed">
 	<thead>
@@ -58,50 +113,152 @@ Otherwise your changes will be overwritten the next time you save the extension 
 		<f:for each="{dates}" as="currentDate">
 			<tr>
 				<td>
-					<f:link.action action="calendar" arguments="{date : currentDate.date.timestamp}"> <f:format.date format="D Y-m-d">{currentDate.date}</f:format.date></f:link.action> <br />
+					<div class="time-data">
+						<f:link.action action="calendar" arguments="{date : currentDate.date.timestamp}"> <f:format.date format="D Y-m-d">{currentDate.date}</f:format.date></f:link.action> <br />
 
-					<f:format.number>{currentDate.isInHours}</f:format.number> of <f:format.number>{currentDate.shouldInHours}</f:format.number>
+
+						<!-- Show the diffence between should and is -->
+						<f:if condition="{currentDate.differenceInHours} >= 0">
+							<f:then>
+								<span class="label label-success">
+									{currentDate.differenceAsFormattedDateInterval}
+								</span>
+							</f:then>
+
+							<f:else>
+								<f:if condition="{currentDate.differenceInHours} >= -1">
+									<span class="label label-warning">
+										{currentDate.differenceAsFormattedDateInterval}
+									</span>
+								</f:if>
+
+								<f:if condition="{currentDate.differenceInHours} < -1">
+									<span class="label label-important">
+										{currentDate.differenceAsFormattedDateInterval}
+									</span>
+								</f:if>
+							</f:else>
+						</f:if>
+
+						<f:format.number>{currentDate.isInHours}</f:format.number> of <f:format.number>{currentDate.shouldInHours}</f:format.number>
+					</div>
+
+					<!-- Show a warning if less than 1% are full -->
+					<div class="time-warning">
+						<f:if condition="{currentDate.differenceInPercent} < 1">
+							<f:if condition="{currentDate.shouldInSeconds} != 0">
+								<div class="warning img-circle">
+									<div class="warning-inner img-circle">!</div>
+								</div>
+							</f:if>
+						</f:if>
+					</div>
+
+					<!-- Show the process bar -->
+					<div class="time-percent">
+						<f:if condition="{currentDate.shouldInSeconds} != 0">
+							<f:then>
+								<f:if condition="{currentDate.differenceInPercent} > 100">
+									<div class="progress progress-success">
+										<div class="bar" style="width: {currentDate.differenceInPercent}%"></div>
+									</div>
+								</f:if>
+
+								<f:if condition="{currentDate.differenceInPercent} == 100">
+									<div class="progress progress-info">
+										<div class="bar" style="width: {currentDate.differenceInPercent}%"></div>
+									</div>
+								</f:if>
+
+								<f:if condition="{currentDate.differenceInPercent} < 100">
+									<div class="progress progress-danger">
+										<div class="bar" style="width: {currentDate.differenceInPercent}%"></div>
+									</div>
+								</f:if>
+
+								<f:comment>
+								<!-- <f:if condition="{currentDate.differenceInPercent} >= 100">
+									<f:then>
+										<div class="progress progress-success">
+											<div class="bar" style="width: {currentDate.differenceInPercent}%"></div>
+										</div>
+									</f:then>
+
+									<f:else>
+										<div class="progress progress-danger">
+											<div class="bar" style="width: {currentDate.differenceInPercent}%"></div>
+										</div>
+									</f:else>
+								</f:if> -->
+								</f:comment>
+							</f:then>
+
+							<f:else>
+								<div class="progress progress-danger">
+									<div class="bar" style="width:0%"></div>
+								</div>
+							</f:else>
+						</f:if>
+					</div>
 
 
-					{currentDate.differenceAsFormattedDateInterval}<br />
-
-					<f:if condition="{currentDate.differenceInPercent} > 100">
-						<f:then>
-							<div class="progress progress-success">
-								<div class="bar" style="width: {currentDate.differenceInPercent}%"></div>
-							</div>
-						</f:then>
-
-						<f:else>
-							<div class="progress progress-danger">
-								<div class="bar" style="width: {currentDate.differenceInPercent}%"></div>
-							</div>
-						</f:else>
-					</f:if>
 				</td>
 				<td>
 					Number of records: <f:count>{currentDate.records}</f:count>
 
-					<table class="table table-hover table-condensed">
-						<tr>
-							<th><f:translate>Start</f:translate></th>
-							<th><f:translate>End</f:translate></th>
-							<th><f:translate>Duration</f:translate></th>
-							<th><f:translate>Comment</f:translate></th>
-							<th><f:translate>Project title</f:translate></th>
-						</tr>
 
-						<f:for each="{currentDate.records}" as="record">
+
+
+
+					<div class="create-new-box">
+						<a class="create-new-button" 
+						data-toggle="popover" 
+						data-placement="left" data-content="#create-new-popover-content-{currentDate.date}" 
+						title="" data-original-title=""
+						id="create-new-button-{currentDate.date}">new</a>
+
+						<script type="text/javascript">
+						$('#create-new-button-{currentDate.date}').popover({
+							html: true,
+							content: '\
+							<div class="create-new-popover-content" id="create-new-popover-content-{currentDate.date}"> \
+								<div class="create-new-record"> \
+									<f:link.action action="new" arguments="{startDate: currentDate.date.timestamp}">New Time Record</f:link.action> \
+								</div> \
+								<div class="create-new-special-record"> \
+									<f:link.action action="new" arguments="{startDate: currentDate.date.timestamp}" controller="SpecialRecord">New Special Record</f:link.action> \
+								</div> \
+							</div> \
+							'
+						});
+						</script>
+
+
+
+						
+					</div>
+
+					<f:if condition="{currentDate.records}">
+						<table class="table table-hover table-condensed">
 							<tr>
-								<td><f:link.action action="show" arguments="{record : record}"> <f:format.date format="Y-m-d H:i">{record.start}</f:format.date></f:link.action></td>
-								<td><f:link.action action="show" arguments="{record : record}"> <f:format.date format="Y-m-d H:i">{record.end}</f:format.date></f:link.action></td>
-								<td><f:link.action action="show" arguments="{record : record}"> {record.formattedDuration}</f:link.action></td>
-								<td><f:link.action action="show" arguments="{record : record}"> {record.comment}</f:link.action></td>
-								<td><f:link.action action="show" controller="project" arguments="{project : record.task.project}"> {record.task.project.title}</f:link.action></td>
+								<th><f:translate>Start</f:translate></th>
+								<th><f:translate>End</f:translate></th>
+								<th><f:translate>Duration</f:translate></th>
+								<th><f:translate>Comment</f:translate></th>
+								<th><f:translate>Project title</f:translate></th>
 							</tr>
-						</f:for>
-					</table>
 
+							<f:for each="{currentDate.records}" as="record">
+								<tr>
+									<td><f:link.action action="show" arguments="{record : record}"> <f:format.date format="Y-m-d H:i">{record.start}</f:format.date></f:link.action></td>
+									<td><f:link.action action="show" arguments="{record : record}"> <f:format.date format="Y-m-d H:i">{record.end}</f:format.date></f:link.action></td>
+									<td><f:link.action action="show" arguments="{record : record}"> {record.formattedDuration}</f:link.action></td>
+									<td><f:link.action action="show" arguments="{record : record}"> {record.comment}</f:link.action></td>
+									<td><f:link.action action="show" controller="project" arguments="{project : record.task.project}"> {record.task.project.title}</f:link.action></td>
+								</tr>
+							</f:for>
+						</table>
+					</f:if>
 				</td>
 			</tr>
 		</f:for>
@@ -110,9 +267,22 @@ Otherwise your changes will be overwritten the next time you save the extension 
 	<tfoot>
 		<tr>
 			<td>
-				{totalDifferenceHours} <br />
-				{totalDifferenceFormatted}<br />
-				<f:format.number>{totalActualHours}</f:format.number> of <f:format.number>{totalTargetHours}</f:format.number>
+				<f:if condition="{totalDifferenceHours} >= 0">
+					<f:then>
+						<span class="label label-success">
+							{totalDifferenceFormatted}
+						</span>
+					</f:then>
+
+					<f:else>
+						<span class="label label-important">
+							{totalDifferenceFormatted}
+						</span>
+					</f:else>
+				</f:if>
+				<br />
+				Days: <f:format.number>{totalActualDays}</f:format.number> of <f:format.number>{totalTargetDays}</f:format.number> <br />
+				Hours: <f:format.number>{totalActualHours}</f:format.number> of <f:format.number>{totalTargetHours}</f:format.number> <br />
 
 
 				<f:if condition="{totalDifferenceInPercent} > 100">
@@ -138,7 +308,7 @@ Otherwise your changes will be overwritten the next time you save the extension 
 
 
 
-<f:form action="calendar" method="post">
+<f:form action="calendar" method="get">
 	<f:form.select name="calendarMode" value="{calendarMode}" options="{calendarModes}" />
 	<f:form.textfield name="date" value="{date}" placeholder="Enter date" />
 	<f:form.submit value="Change view" class="btn" />

@@ -7,7 +7,8 @@ namespace Cundd\TimeOverview\Controller;
  *                                                                        */
 
 use TYPO3\Flow\Annotations as Flow;
-use \Cundd\TimeOverview\Domain\Model\SpecialRecord as SpecialRecord;
+use Cundd\TimeOverview\Domain\Model\SpecialRecord as SpecialRecord;
+use Iresults\Core\DateTime as DateTime;
 
 ini_set('display_errors', TRUE);
 
@@ -49,9 +50,45 @@ class SpecialRecordController extends \TYPO3\Flow\Mvc\Controller\ActionControlle
 	/**
 	 * action new
 	 *
+	 * @param string $startDate
 	 * @return void
 	 */
-	public function newAction() {
+	public function newAction($startDate = NULL) {
+		$startDate = new DateTime($startDate);
+		$newRecord = new SpecialRecord();
+		$newRecord->setStart($startDate);
+		$this->view->assign('newSpecialRecord', $newRecord);
+	}
+
+	public function initializeCreateAction() {
+		\Iresults\Core\Iresults::forceDebug();
+		\Iresults\Core\Iresults::pd($this->arguments['newSpecialRecord']);
+
+		\Iresults\Core\Iresults::pd($this->arguments['newSpecialRecord']->getPropertyMappingConfiguration());
+
+		$this->arguments['newSpecialRecord']
+			->getPropertyMappingConfiguration()
+			->forProperty('start')
+			->setTypeConverterOption('TYPO3\Flow\Property\TypeConverter\DateTimeConverter', \TYPO3\Flow\Property\TypeConverter\DateTimeConverter::CONFIGURATION_DATE_FORMAT, 'Y-m-d H:i');
+
+		$this->arguments['newSpecialRecord']
+			->getPropertyMappingConfiguration()
+			->forProperty('end')
+			->setTypeConverterOption('TYPO3\Flow\Property\TypeConverter\DateTimeConverter', \TYPO3\Flow\Property\TypeConverter\DateTimeConverter::CONFIGURATION_DATE_FORMAT, 'Y-m-d H:i');
+
+		// $this->arguments['newSpecialRecord']
+		// 	->getPropertyMappingConfiguration()
+		// 	->forProperty('startDate')
+		// 	->setTypeConverterOption('TYPO3\Flow\Property\TypeConverter\DateTimeConverter', \TYPO3\Flow\Property\TypeConverter\DateTimeConverter::CONFIGURATION_DATE_FORMAT, 'Y-m-d H:i');
+
+        // $commentConfiguration = $this->arguments['comment']->getPropertyMappingConfiguration();
+        // $commentConfiguration->allowAllProperties();
+        // $commentConfiguration
+        //         ->setTypeConverterOption(
+        //         'TYPO3\Flow\Property\TypeConverter\PersistentObjectConverter',
+        //         \TYPO3\Flow\Property\TypeConverter\PersistentObjectConverter::CONFIGURATION_CREATION_ALLOWED,
+        //         TRUE
+        // );
 	}
 
 	/**

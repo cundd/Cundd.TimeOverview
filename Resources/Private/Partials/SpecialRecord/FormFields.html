@@ -1,6 +1,8 @@
 {namespace ir=Iresults\Core\ViewHelpers}
 
-<ir:javascript.include>Iresults.Forms.HTML5</ir:javascript.include>
+<f:comment>
+<ir:javascript.include>Iresults.Core.Forms.HTML5</ir:javascript.include>
+</f:comment>
 
 
 <label for="title">
@@ -20,10 +22,10 @@
 
 <label for="start">
 	<f:translate>Start</f:translate> <span class="required">(required)</span>
-	<f:form.textfield property="start" type="date" value="{specialRecord.start->f:format.date()}" />
+	<f:form.textfield property="start" type="datetime" value="{specialRecord.start->f:format.date()}" />
 </label><br />
 
 <label for="end">
 	<f:translate>End</f:translate>
-	<f:form.textfield property="end" type="date" value="{specialRecord.end->f:format.date()}" />
+	<f:form.textfield property="end" type="datetime" value="{specialRecord.end->f:format.date()}" />
 </label><br />

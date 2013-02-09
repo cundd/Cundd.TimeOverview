@@ -312,8 +312,8 @@ class Date {
 	 * @return float Difference in percent
 	 */
 	public function getDifferenceInPercent() {
-		if (!$this->getSecondsPerWorkingDay() || !$this->getWorkedSeconds()) {
-			return FALSE;
+		if (!$this->getShouldInSeconds()) {
+			return 100;
 		}
 		return $this->getWorkedSeconds() / $this->getSecondsPerWorkingDay() * 100;
 	}

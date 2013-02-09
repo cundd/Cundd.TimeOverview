@@ -77,7 +77,7 @@ class Record {
 	 * @param \DateTime $start
 	 * @return void
 	 */
-	public function setStart($start) {
+	public function setStart(\DateTime $start) {
 		$this->start = $start;
 	}
 
@@ -96,7 +96,7 @@ class Record {
 	 * @param \DateTime $end
 	 * @return void
 	 */
-	public function setEnd($end) {
+	public function setEnd(\DateTime $end) {
 		$this->end = $end;
 	}
 
