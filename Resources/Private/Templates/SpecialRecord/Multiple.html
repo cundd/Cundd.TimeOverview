@@ -1,0 +1,91 @@
+<f:layout name="Default" />
+{namespace ir=Iresults\Core\ViewHelpers}
+
+This Template is responsible for creating a table of domain objects.
+
+If you modify this template, do not forget to change the overwrite settings
+in /Configuration/ExtensionBuilder/settings.yaml:
+  Resources:
+    Private:
+      Templates:
+        List.html: keep
+
+Otherwise your changes will be overwritten the next time you save the extension in the extension builder
+
+<f:section name="main">
+<h1>Listing for SpecialRecord</h1>
+
+<f:flashMessages />
+
+<f:comment>
+<ir:javascript.include>Iresults.Core.Forms.HTML5</ir:javascript.include>
+</f:comment>
+
+<!--
+	<f:comment>
+	<f:form action="createMultiple" objectName="records">
+	</f:form>
+	</f:comment>
+-->
+<f:form action="createMultiple" objectName="records">
+
+	<table class="tx_cunddtimeoverview table table-striped table-condensed">
+		<tr>
+			<th><f:translate>Title</f:translate></th>
+			<th><f:translate>Recurring</f:translate></th>
+			<th><f:translate>Comment</f:translate></th>
+
+			<th><f:translate>Start</f:translate></th>
+			<th><f:translate>End</f:translate></th>
+			<th><f:translate>Type</f:translate></th>
+			<!-- <th><f:translate>Duration</f:translate></th> -->
+			<!-- <th><f:translate>Project title</f:translate></th> -->
+		</tr>
+
+		<f:for each="{records}" as="record">
+			<f:alias map="{formObject: record}">
+				<tr>
+					<!-- <td> {record.title}</td>
+					<td> {record.recurring}</td>
+
+					<td> <f:format.date format="Y-m-d H:i">{record.start}</f:format.date></td>
+					<td> <f:format.date format="Y-m-d H:i">{record.end}</f:format.date></td>
+					<td> {record.formattedDuration}</td>
+					<td> {record.comment}</td>
+					<td> {record.task.project.title}</td> -->
+
+					<td>
+						<f:form.textfield property="title" />
+					</td>
+					<td>
+						<f:form.checkbox property="recurring" value="1" />
+					</td>
+					<td>
+						<f:form.textarea property="comment" cols="40" rows="5" />
+					</td>
+					<td>
+						<f:form.textfield property="start" type="datetime" value="{f:format.date(format:'Y-m-d H:i', date:record.start)}" />
+					</td>
+					<td>
+						<f:form.textfield property="end" type="datetime" value="{f:format.date(format:'Y-m-d H:i', date:record.end)}" />
+					</td>
+					<td>
+						{record.recordType}
+						<f:if condition="{0: record.recordType} == {0: 'RECORD_TYPE_SPECIAL'}">
+							<i class="icon-star icon-white"></i> Special
+						</f:if>
+						<f:if condition="{0: record.recordType} == {0: 'RECORD_TYPE_STANDARD'}">
+							Standard
+						</f:if>
+					</td>
+				</tr>
+			</f:alias>
+		</f:for>
+	</table>
+
+	<f:form.submit class="btn" value="Create" />
+
+</f:form>
+</f:section>
+
+

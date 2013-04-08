@@ -3,6 +3,12 @@
 	[
 		{
 			"path": "/Library/Server/Web/Data/Sites/flow.danielbigman.local/Flow"
+		},
+		{
+			"path": "/Applications/MAMP/web_cvjm/typo3conf/ext/cat"
+		},
+		{
+			"path": "/Volumes/Daten HD/Users/daniel/Sites/intro"
 		}
 	]
 }

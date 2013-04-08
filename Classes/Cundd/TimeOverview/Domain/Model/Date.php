@@ -55,6 +55,13 @@ class Date {
 	 */
 	protected $specialRecordsTotalSeconds = NULL;
 
+	/**
+	 * The special and standard records
+	 * @var \SplObjectStorage<\Cundd\TimeOverview\Domain\Model\Record>
+	 * @Flow\Transient
+	 */
+	protected $allRecords;
+
 
 
 	/**
@@ -95,6 +102,55 @@ class Date {
 	 */
 	public function setDate($date) {
 		$this->date = $date;
+		$this->resetAllRecordsProperty();
+	}
+
+	/**
+	 * Returns the special and standard Records
+	 *
+	 * @return \SplObjectStorage<\Cundd\TimeOverview\Domain\Model\Record> The Date's special and standard records
+	 */
+	public function getAllRecords() {
+		if (!$this->allRecords) {
+			$collection = new \Doctrine\Common\Collections\ArrayCollection();
+
+			foreach ($this->getRecords() as $record) {
+				$collection->add($record);
+				\Iresults\Core\Iresults::pd('Rec', $record);
+			}
+			foreach ($this->getSpecialRecords() as $record) {
+				$collection->add($record);
+				\Iresults\Core\Iresults::pd('SRec', $record, $record->getStart());
+			}
+
+			// $tempAllRecords = $this->getRecords();
+			// if ($tempAllRecords instanceof \Iterator) {
+			// 	$tempAllRecords = iterator_to_array($this->getRecords());
+			// }
+
+			// $specialRecords = $this->getSpecialRecords();
+			// if ($specialRecords instanceof \Iterator) {
+			// 	$tempAllRecords = array_merge($tempAllRecords, iterator_to_array($specialRecords));
+			// }
+
+			// while ($record = current($tempAllRecords)) {
+			// 	$collection->add($record);
+			// 	next($tempAllRecords);
+			// }
+			$this->allRecords = $collection;
+		}
+		return $this->allRecords;
+	}
+
+	/**
+	 * Resets the allRecords property
+	 *
+	 * @return void
+	 */
+	protected function resetAllRecordsProperty() {
+		if ($this->allRecords) {
+			$this->allRecords = NULL;
+		}
 	}
 
 	/**
@@ -105,6 +161,7 @@ class Date {
 	 */
 	public function addRecord(Record $record) {
 		$this->workedSeconds = NULL;
+		$this->resetAllRecordsProperty();
 		$this->records->add($record);
 	}
 
@@ -116,6 +173,7 @@ class Date {
 	 */
 	public function removeRecord(Record $recordToRemove) {
 		$this->workedSeconds = NULL;
+		$this->resetAllRecordsProperty();
 		$this->records->removeElement($recordToRemove);
 	}
 
@@ -136,6 +194,7 @@ class Date {
 	 */
 	public function setRecords(\SplObjectStorage $records) {
 		$this->workedSeconds = NULL;
+		$this->resetAllRecordsProperty();
 		$this->records = $records;
 	}
 
@@ -146,7 +205,12 @@ class Date {
 	 * @return void
 	 */
 	public function addSpecialRecord(SpecialRecord $record) {
-		$this->specialRecords->add($record);
+		if (!$this->specialRecords->contains($record)) {
+			$this->resetAllRecordsProperty();
+			// \Iresults\Core\Iresults::pd('SetRec', $record, $record->getStart());
+			// \Iresults\Core\Iresults::pd($this->specialRecords->contains($record));
+			$this->specialRecords->add($record);
+		}
 	}
 
 	/**
@@ -156,6 +220,7 @@ class Date {
 	 * @return void
 	 */
 	public function removeSpecialRecords(SpecialRecord $recordToRemove) {
+		$this->resetAllRecordsProperty();
 		$this->specialRecords->removeElement($recordToRemove);
 	}
 
@@ -175,6 +240,7 @@ class Date {
 	 * @return void
 	 */
 	public function setSpecialRecords(\SplObjectStorage $specialRecords) {
+		$this->resetAllRecordsProperty();
 		$this->specialRecords = $specialRecords;
 	}
 
@@ -329,6 +395,7 @@ class Date {
 		$date2 = new \DateTime();
 		$difference = $this->getDifferenceInSeconds();
 
+		$difference = round($difference);
 		$date2->add(new \DateInterval('PT' . abs($difference) . 'S'));
 
 		$duration = $date2->diff($date1);

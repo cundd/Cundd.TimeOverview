@@ -1,12 +1,20 @@
-<label for="start">
-	<f:translate id="tx_cunddtimeoverview_domain_model_record.start" /> <span class="required">(required)</span>
-</label><br />
-	<f:form.textfield property="start"  value="{record.start->f:format.date()}" /><br />
-<label for="end">
-	<f:translate id="tx_cunddtimeoverview_domain_model_record.end" /> <span class="required">(required)</span>
-</label><br />
-	<f:form.textfield property="end"  value="{record.end->f:format.date()}" /><br />
+{namespace ir=Iresults\Core\ViewHelpers}
+
+<f:comment>
+<ir:javascript.include>Iresults.Core.Forms.HTML5</ir:javascript.include>
+</f:comment>
+
 <label for="comment">
-	<f:translate id="tx_cunddtimeoverview_domain_model_record.comment" />
+	<f:translate>Comment</f:translate>
+	<f:form.textarea property="comment" cols="40" rows="15" />
 </label><br />
-	<f:form.textarea property="comment" cols="40" rows="15" /><br />
+
+<label for="start">
+	<f:translate>Start</f:translate> <span class="required">(required)</span>
+	<f:form.textfield property="start" type="datetime" value="{f:format.date(format:'Y-m-d H:i', date:record.start)}" />
+</label><br />
+
+<label for="end">
+	<f:translate>End</f:translate>
+	<f:form.textfield property="end" type="datetime" value="{f:format.date(format:'Y-m-d H:i', date:record.end)}" />
+</label><br />

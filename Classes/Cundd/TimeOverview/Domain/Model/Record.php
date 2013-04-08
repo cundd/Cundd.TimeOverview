@@ -179,6 +179,11 @@ class Record {
 	public function getFormattedDuration() {
 		$duration = $this->getDuration();
 		if ($duration) {
+
+			$hours   = $duration->days * 24 + $duration->h;
+			$minutes = $duration->i;
+
+			return sprintf('%02sh %smin', $hours, $minutes);
 			return $duration->format('%hh %Imin');
 		}
 		return '';
@@ -196,6 +201,18 @@ class Record {
 			return FALSE;
 		}
 		return $end - $start;
+	}
+
+	/**
+	 * Returns the record type
+	 *
+	 * @return string
+	 */
+	public function getRecordType() {
+		if ($this instanceof SpecialRecord) {
+			return self::RECORD_TYPE_SPECIAL;
+		}
+		return self::RECORD_TYPE_STANDARD;
 	}
 
 

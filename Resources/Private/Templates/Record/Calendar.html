@@ -1,5 +1,6 @@
 <f:layout name="Default" />
 {namespace ir=Iresults\Core\ViewHelpers}
+{namespace cto=Cundd\TimeOverview\ViewHelpers}
 
 This Template is responsible for creating a table of domain objects.
 
@@ -99,6 +100,17 @@ Otherwise your changes will be overwritten the next time you save the extension 
 	.create-new-box {
 		float: right;
 	}
+
+	.create-new-button {
+		cursor: pointer;
+	}
+
+	i.icon-white {
+		opacity: 0.5;
+	}
+	i.icon-white:hover {
+		opacity: 0.8;
+	}
 </style>
 
 <table class="tx_cunddtimeoverview table table-striped table-condensed">
@@ -113,8 +125,9 @@ Otherwise your changes will be overwritten the next time you save the extension 
 		<f:for each="{dates}" as="currentDate">
 			<tr>
 				<td>
+					<cto:anchor date="{currentDate}" />
 					<div class="time-data">
-						<f:link.action action="calendar" arguments="{date : currentDate.date.timestamp}"> <f:format.date format="D Y-m-d">{currentDate.date}</f:format.date></f:link.action> <br />
+						<f:link.action action="calendar" arguments="{calendarMode:'CALENDAR_MODE_WEEK', date : currentDate.date.timestamp}"> <f:format.date format="D Y-m-d">{currentDate.date}</f:format.date></f:link.action> <br />
 
 
 						<!-- Show the diffence between should and is -->
@@ -158,19 +171,32 @@ Otherwise your changes will be overwritten the next time you save the extension 
 					<div class="time-percent">
 						<f:if condition="{currentDate.shouldInSeconds} != 0">
 							<f:then>
-								<f:if condition="{currentDate.differenceInPercent} > 100">
-									<div class="progress progress-success">
-										<div class="bar" style="width: {currentDate.differenceInPercent}%"></div>
-									</div>
+								<!-- Percent >= 100% -->
+								<f:if condition="{currentDate.differenceInPercent} >= 100">
+									<f:then>
+										<div class="progress progress-success">
+											<div class="bar" style="width: {currentDate.differenceInPercent}%"></div>
+										</div>
+									</f:then>
+								<!-- 75% < Percent < 100% -->
+									<f:else>
+										<f:if condition="{currentDate.differenceInPercent} >= 75">
+											<div class="progress progress-warning">
+												<div class="bar" style="width: {currentDate.differenceInPercent}%"></div>
+											</div>
+										</f:if>
+									</f:else>
 								</f:if>
 
+								<!-- Percent == 100% -->
 								<f:if condition="{currentDate.differenceInPercent} == 100">
 									<div class="progress progress-info">
 										<div class="bar" style="width: {currentDate.differenceInPercent}%"></div>
 									</div>
 								</f:if>
 
-								<f:if condition="{currentDate.differenceInPercent} < 100">
+								<!-- Percent < 75% -->
+								<f:if condition="{currentDate.differenceInPercent} < 75">
 									<div class="progress progress-danger">
 										<div class="bar" style="width: {currentDate.differenceInPercent}%"></div>
 									</div>
@@ -204,18 +230,14 @@ Otherwise your changes will be overwritten the next time you save the extension 
 
 				</td>
 				<td>
-					Number of records: <f:count>{currentDate.records}</f:count>
-
-
-
-
+					Number of records: <f:count>{currentDate.allRecords}</f:count>
 
 					<div class="create-new-box">
-						<a class="create-new-button" 
-						data-toggle="popover" 
-						data-placement="left" data-content="#create-new-popover-content-{currentDate.date}" 
+						<a class="create-new-button"
+						data-toggle="popover"
+						data-placement="left" data-content="#create-new-popover-content-{currentDate.date}"
 						title="" data-original-title=""
-						id="create-new-button-{currentDate.date}">new</a>
+						id="create-new-button-{currentDate.date}"><i class="icon-plus icon-white"></i></a>
 
 						<script type="text/javascript">
 						$('#create-new-button-{currentDate.date}').popover({
@@ -232,29 +254,39 @@ Otherwise your changes will be overwritten the next time you save the extension 
 							'
 						});
 						</script>
-
-
-
-						
 					</div>
 
-					<f:if condition="{currentDate.records}">
+					<f:if condition="{currentDate.allRecords}">
 						<table class="table table-hover table-condensed">
 							<tr>
+								<th><f:translate>Title</f:translate></th>
 								<th><f:translate>Start</f:translate></th>
 								<th><f:translate>End</f:translate></th>
 								<th><f:translate>Duration</f:translate></th>
 								<th><f:translate>Comment</f:translate></th>
 								<th><f:translate>Project title</f:translate></th>
+								<th></th>
+								<th></th>
 							</tr>
 
-							<f:for each="{currentDate.records}" as="record">
+							<f:for each="{currentDate.allRecords}" as="record">
 								<tr>
+									<td>
+										<f:if condition="{0: record.recordType} == {0: 'RECORD_TYPE_SPECIAL'}">
+											<i class="icon-star icon-white"></i>
+										</f:if>
+										<!-- <f:if condition="{0: record.recordType} == {0: 'RECORD_TYPE_STANDARD'}">
+											Standard
+										</f:if> -->
+										{record.title}
+									</td>
 									<td><f:link.action action="show" arguments="{record : record}"> <f:format.date format="Y-m-d H:i">{record.start}</f:format.date></f:link.action></td>
 									<td><f:link.action action="show" arguments="{record : record}"> <f:format.date format="Y-m-d H:i">{record.end}</f:format.date></f:link.action></td>
 									<td><f:link.action action="show" arguments="{record : record}"> {record.formattedDuration}</f:link.action></td>
 									<td><f:link.action action="show" arguments="{record : record}"> {record.comment}</f:link.action></td>
 									<td><f:link.action action="show" controller="project" arguments="{project : record.task.project}"> {record.task.project.title}</f:link.action></td>
+									<td><f:link.action action="edit" arguments="{record : record}"> <i class="icon-edit icon-white"></i></f:link.action></td>
+									<td><f:link.action action="delete" arguments="{record : record}"> <i class="icon-trash icon-white"></i></f:link.action></td>
 								</tr>
 							</f:for>
 						</table>

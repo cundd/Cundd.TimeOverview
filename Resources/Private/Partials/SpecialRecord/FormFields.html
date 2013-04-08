@@ -22,10 +22,10 @@
 
 <label for="start">
 	<f:translate>Start</f:translate> <span class="required">(required)</span>
-	<f:form.textfield property="start" type="datetime" value="{specialRecord.start->f:format.date()}" />
+	<f:form.textfield property="start" type="datetime" value="{f:format.date(format:'Y-m-d H:i', date:specialRecord.start)}" />
 </label><br />
 
 <label for="end">
 	<f:translate>End</f:translate>
-	<f:form.textfield property="end" type="datetime" value="{specialRecord.end->f:format.date()}" />
+	<f:form.textfield property="end" type="datetime" value="{f:format.date(format:'Y-m-d H:i', date:specialRecord.end)}" />
 </label><br />

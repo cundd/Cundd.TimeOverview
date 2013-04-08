@@ -12,14 +12,31 @@ in /Configuration/ExtensionBuilder/settings.yaml:
 Otherwise your changes will be overwritten the next time you save the extension in the extension builder
 
 <f:section name="main">
-<h1>Edit Record</h1>
+<f:if condition="{record.title}">
+	<f:then>
+		<h1>Edit Special Record <i>{record.title}</i></h1>
+	</f:then>
+	<f:else>
+		<h1>Edit Record</h1>
+	</f:else>
+</f:if>
 
 <f:flashMessages />
 
 <f:render partial="FormErrors" arguments="{object:Record}"/>
 
-<f:form action="update" name="record" object="{record}" >
-<f:render partial="Record/FormFields" arguments="{record:record}" />
-	<f:form.submit value="Save" />
-</f:form>
+<f:if condition="{record.title}">
+	<f:then>
+		<f:form action="update" name="specialRecord" object="{record}" controller="SpecialRecord">
+			<f:render partial="SpecialRecord/FormFields" arguments="{specialRecord:record}" />
+			<f:form.submit value="Save" class="btn" />
+		</f:form>
+	</f:then>
+	<f:else>
+		<f:form action="update" name="record" object="{record}" >
+			<f:render partial="Record/FormFields" arguments="{record:record}" />
+			<f:form.submit value="Save" class="btn" />
+		</f:form>
+	</f:else>
+</f:if>
 </f:section>

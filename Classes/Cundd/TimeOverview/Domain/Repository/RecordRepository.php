@@ -61,6 +61,12 @@ class RecordRepository extends \TYPO3\Flow\Persistence\Repository {
 	public function findByStartDateBetweenStartAndEnd($start, $end) {
 		$query = $this->createQuery();
 
+		$recordType = 'standard_record';
+		if (get_class($this) === 'Cundd\\TimeOverview\\Domain\\Repository\\SpecialRecordRepository') {
+			$recordType = 'special_record';
+		}
+		\Iresults\Core\Iresults::pd('blur', $recordType, get_class($this));
+
 		$query->matching(
             $query->logicalAnd(
                 $query->greaterThanOrEqual('start', $start), 	// The record's start must be bigger than the start date
@@ -68,6 +74,14 @@ class RecordRepository extends \TYPO3\Flow\Persistence\Repository {
                 $query->lessThan('end', $end) 					// The record's start must be lower than the end date
             )
         );
+
+        // $query->matching(
+        //     $query->logicalAnd(
+        //     	$query->like('record_type', $recordType),
+        //     	// $query->like('record_type', $recordType),
+        //         $query->lessThan('start', $end)	 			// The record's start must be lower than the end date
+        //     )
+        // );
 
         $query->setOrderings(array(
             'start' => \TYPO3\Flow\Persistence\QueryInterface::ORDER_ASCENDING)

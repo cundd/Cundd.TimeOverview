@@ -16,13 +16,16 @@ Otherwise your changes will be overwritten the next time you save the extension 
 
 <f:flashMessages />
 
-<table  class="tx_cunddtimeoverview" >
+<table class="tx_cunddtimeoverview table table-striped table-condensed">
 	<tr>
 		<th><f:translate>Title</f:translate></th>
 		<th><f:translate>Recurring</f:translate></th>
-		<th><f:translate>Comment</f:translate></th>
+
 		<th><f:translate>Start</f:translate></th>
 		<th><f:translate>End</f:translate></th>
+		<th><f:translate>Duration</f:translate></th>
+		<th><f:translate>Comment</f:translate></th>
+		<th><f:translate>Project title</f:translate></th>
 		<th> </th>
 		<th> </th>
 	</tr>
@@ -31,14 +34,15 @@ Otherwise your changes will be overwritten the next time you save the extension 
 		<tr>
 			<td><f:link.action action="show" arguments="{specialRecord : specialRecord}"> {specialRecord.title}</f:link.action></td>
 			<td><f:link.action action="show" arguments="{specialRecord : specialRecord}"> {specialRecord.recurring}</f:link.action></td>
+
+			<td><f:link.action action="show" arguments="{specialRecord : specialRecord}"> <f:format.date format="Y-m-d H:i">{specialRecord.start}</f:format.date></f:link.action></td>
+			<td><f:link.action action="show" arguments="{specialRecord : specialRecord}"> <f:format.date format="Y-m-d H:i">{specialRecord.end}</f:format.date></f:link.action></td>
+			<td><f:link.action action="show" arguments="{specialRecord : specialRecord}"> {specialRecord.formattedDuration}</f:link.action></td>
 			<td><f:link.action action="show" arguments="{specialRecord : specialRecord}"> {specialRecord.comment}</f:link.action></td>
-			<td><f:link.action action="show" arguments="{specialRecord : specialRecord}"> {specialRecord.start -> f:format.date()}</f:link.action></td>
-			<td><f:link.action action="show" arguments="{specialRecord : specialRecord}"> {specialRecord.end -> f:format.date()}</f:link.action></td>
+			<td><f:link.action action="show" controller="project" arguments="{project : specialRecord.task.project}"> {specialRecord.task.project.title}</f:link.action></td>
 			<td><f:link.action action="edit" arguments="{specialRecord : specialRecord}">Edit</f:link.action></td>
 			<td><f:link.action action="delete" arguments="{specialRecord : specialRecord}">Delete</f:link.action></td>
 		</tr>
 	</f:for>
 </table>
-
-<f:link.action action="new">New SpecialRecord</f:link.action>
 </f:section>

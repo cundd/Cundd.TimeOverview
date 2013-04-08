@@ -8,6 +8,7 @@ namespace Cundd\TimeOverview\Controller;
 
 use TYPO3\Flow\Annotations as Flow;
 use Cundd\TimeOverview\Domain\Model\SpecialRecord as SpecialRecord;
+use Cundd\TimeOverview\Domain\Model\SpecialRecord as Record;
 use Iresults\Core\DateTime as DateTime;
 
 ini_set('display_errors', TRUE);
@@ -17,7 +18,7 @@ ini_set('display_errors', TRUE);
  *
  * @Flow\Scope("singleton")
  */
-class SpecialRecordController extends \TYPO3\Flow\Mvc\Controller\ActionController {
+class SpecialRecordController extends AbstractRecordController {
 
 	/**
 	 * specialRecordRepository
@@ -57,38 +58,8 @@ class SpecialRecordController extends \TYPO3\Flow\Mvc\Controller\ActionControlle
 		$startDate = new DateTime($startDate);
 		$newRecord = new SpecialRecord();
 		$newRecord->setStart($startDate);
+		$newRecord->setEnd($startDate->dateByAddingTimeInterval(60 * 60 * 8));
 		$this->view->assign('newSpecialRecord', $newRecord);
-	}
-
-	public function initializeCreateAction() {
-		\Iresults\Core\Iresults::forceDebug();
-		\Iresults\Core\Iresults::pd($this->arguments['newSpecialRecord']);
-
-		\Iresults\Core\Iresults::pd($this->arguments['newSpecialRecord']->getPropertyMappingConfiguration());
-
-		$this->arguments['newSpecialRecord']
-			->getPropertyMappingConfiguration()
-			->forProperty('start')
-			->setTypeConverterOption('TYPO3\Flow\Property\TypeConverter\DateTimeConverter', \TYPO3\Flow\Property\TypeConverter\DateTimeConverter::CONFIGURATION_DATE_FORMAT, 'Y-m-d H:i');
-
-		$this->arguments['newSpecialRecord']
-			->getPropertyMappingConfiguration()
-			->forProperty('end')
-			->setTypeConverterOption('TYPO3\Flow\Property\TypeConverter\DateTimeConverter', \TYPO3\Flow\Property\TypeConverter\DateTimeConverter::CONFIGURATION_DATE_FORMAT, 'Y-m-d H:i');
-
-		// $this->arguments['newSpecialRecord']
-		// 	->getPropertyMappingConfiguration()
-		// 	->forProperty('startDate')
-		// 	->setTypeConverterOption('TYPO3\Flow\Property\TypeConverter\DateTimeConverter', \TYPO3\Flow\Property\TypeConverter\DateTimeConverter::CONFIGURATION_DATE_FORMAT, 'Y-m-d H:i');
-
-        // $commentConfiguration = $this->arguments['comment']->getPropertyMappingConfiguration();
-        // $commentConfiguration->allowAllProperties();
-        // $commentConfiguration
-        //         ->setTypeConverterOption(
-        //         'TYPO3\Flow\Property\TypeConverter\PersistentObjectConverter',
-        //         \TYPO3\Flow\Property\TypeConverter\PersistentObjectConverter::CONFIGURATION_CREATION_ALLOWED,
-        //         TRUE
-        // );
 	}
 
 	/**
@@ -99,7 +70,9 @@ class SpecialRecordController extends \TYPO3\Flow\Mvc\Controller\ActionControlle
 	 */
 	public function createAction(\Cundd\TimeOverview\Domain\Model\SpecialRecord $newSpecialRecord) {
 		$this->specialRecordRepository->add($newSpecialRecord);
-		$this->flashMessageContainer->add('Your new SpecialRecord was created.');
+
+		$message = 'Your new SpecialRecord was created.';
+		$this->flashMessageContainer->addMessage(new \TYPO3\Flow\Error\Message($message, \TYPO3\Flow\Error\Message::SEVERITY_OK));
 		$this->redirect('list');
 	}
 
@@ -121,7 +94,8 @@ class SpecialRecordController extends \TYPO3\Flow\Mvc\Controller\ActionControlle
 	 */
 	public function updateAction(\Cundd\TimeOverview\Domain\Model\SpecialRecord $specialRecord) {
 		$this->specialRecordRepository->update($specialRecord);
-		$this->flashMessageContainer->add('Your SpecialRecord was updated.');
+		$message = 'Your SpecialRecord was updated.';
+		$this->flashMessageContainer->addMessage(new \TYPO3\Flow\Error\Message($message, \TYPO3\Flow\Error\Message::SEVERITY_OK));
 		$this->redirect('list');
 	}
 
@@ -133,7 +107,57 @@ class SpecialRecordController extends \TYPO3\Flow\Mvc\Controller\ActionControlle
 	 */
 	public function deleteAction(\Cundd\TimeOverview\Domain\Model\SpecialRecord $specialRecord) {
 		$this->specialRecordRepository->remove($specialRecord);
-		$this->flashMessageContainer->add('Your SpecialRecord was removed.');
+		$message = 'Your SpecialRecord was removed.';
+		$this->flashMessageContainer->addMessage(new \TYPO3\Flow\Error\Message($message, \TYPO3\Flow\Error\Message::SEVERITY_OK));
+		$this->redirect('list');
+	}
+
+	/**
+	 * Create multiple records at once
+	 *
+	 * @return  void
+	 */
+	public function multipleAction() {
+		$i = 0;
+		$numberOfRecords = 5;
+		$records = array();
+
+		$startDate = new DateTime();
+		$endDate = $startDate->dateByAddingTimeInterval(60 * 60 * 8);
+
+		while ($i++ < $numberOfRecords) {
+			$tempRecord = new SpecialRecord();
+
+			$startDate = $startDate->dateByAddingTimeInterval(60 * 60 * 24);
+			$endDate = $startDate->dateByAddingTimeInterval(60 * 60 * 8);
+
+			$tempRecord->setTitle('New record number ' . $i);
+			$tempRecord->setStart($startDate);
+			$tempRecord->setEnd($endDate);
+
+			$records[] = $tempRecord;
+		}
+		$this->view->assign('records', $records);
+	}
+
+	/**
+	 * Create multiple records at once
+	 *
+	 * @param array<\Cundd\TimeOverview\Domain\Model\Record> $records
+	 * @return void
+	 */
+	public function createMultipleAction($records) {
+		\Iresults\Core\Iresults::forceDebug();
+		foreach ($records as $newRecord) {
+			\Iresults\Core\Iresults::pd($newRecord);
+			if ($newRecord) {
+				$this->specialRecordRepository->add($newRecord);
+			}
+		}
+
+		$message = 'Your new SpecialRecord was created.';
+		$this->flashMessageContainer->addMessage(new \TYPO3\Flow\Error\Message($message, \TYPO3\Flow\Error\Message::SEVERITY_OK));
+
 		$this->redirect('list');
 	}
 

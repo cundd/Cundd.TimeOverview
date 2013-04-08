@@ -21,7 +21,7 @@ set_time_limit(0);
  *
  * @Flow\Scope("singleton")
  */
-class RecordController extends \TYPO3\Flow\Mvc\Controller\ActionController {
+class RecordController extends AbstractRecordController {
 
 	/**
 	 * Property mapper
@@ -121,12 +121,6 @@ class RecordController extends \TYPO3\Flow\Mvc\Controller\ActionController {
 		}
 	}
 
-	static public function frt($var) {
-		echo "PP:";
-		var_dump($var);
-		echo PHP_EOL;
-	}
-
 	/**
 	 * Calendar list
 	 *
@@ -143,9 +137,12 @@ class RecordController extends \TYPO3\Flow\Mvc\Controller\ActionController {
 		$this->prepareDatesForCalendarModeAndDate($calendarMode, $date);
 		// $records = $this->recordRepository->findAll();
 		$records = $this->recordRepository->findByCalendarModeAndDate($calendarMode, $date);
+
+		\Iresults\Core\Iresults::pd('NOC Rec');
 		$specialRecords = $this->specialRecordRepository->findByCalendarModeAndDate($calendarMode, $date);
 
-		\Iresults\Core\Iresults::pd($records);
+		\Iresults\Core\Iresults::pd(iterator_to_array($records));
+		\Iresults\Core\Iresults::pd(iterator_to_array($specialRecords));
 
 		$dates = $this->assignRecordsToDates($records);
 		$dates = $this->assignRecordsToDates($specialRecords);
@@ -181,10 +178,21 @@ class RecordController extends \TYPO3\Flow\Mvc\Controller\ActionController {
 
 		$dates = $this->dates;
 
+		$tableData = array();
+
 		// Calculate the results
 		foreach ($dates as $date) {
-			$totalActualHoursLocal += $date->getIsInHours();
-			$totalTargetHoursLocal += $date->getShouldInHours();
+			$totalActualHoursLocal += (1.0 * $date->getIsInHours());
+			$totalTargetHoursLocal += (1.0 * $date->getShouldInHours());
+
+			$tableData[] = array(
+				'date' 					=> $date->getDate(),
+				'isInHours' 			=> (1.0 * $date->getIsInHours()),
+				'shouldInHours' 		=> (1.0 * $date->getShouldInHours()),
+				'totalActualHours'		=> $totalActualHoursLocal,
+				'totalTargetHours'		=> $totalTargetHoursLocal,
+				'differenceInHours'		=> $date->getDifferenceInHours() * 60,
+			);
 		}
 
 		$this->totalTargetHours = $totalTargetHoursLocal;
@@ -203,11 +211,21 @@ class RecordController extends \TYPO3\Flow\Mvc\Controller\ActionController {
 		$this->view->assign('totalActualDays', $this->totalActualHours / $hoursPerWorkingDay);
 		$this->view->assign('totalDifferenceDays', $this->totalDifferenceHours / $hoursPerWorkingDay);
 
-
 		$divisor = $this->totalTargetHours ? $this->totalTargetHours : 1;
 		$totalDifferenceInPercent = $this->totalActualHours / $divisor * 100;
 		$this->view->assign('totalDifferenceInPercent', $totalDifferenceInPercent);
 		$this->view->assign('totalDifferenceFormatted', $this->getTotalDifferenceFormatted());
+
+		$tableData[] = array(
+				'date' 					=> 'SUM',
+				'isInHours' 			=> $this->totalActualHours,
+				'shouldInHours' 		=> $this->totalTargetHours,
+				'totalActualHours'		=> $totalActualHoursLocal,
+				'totalTargetHours'		=> $totalTargetHoursLocal,
+				'differenceInHours'		=> ($totalActualHoursLocal - $totalTargetHoursLocal) * 60,
+			);
+		// $tableViewHelper = new \Iresults\Core\ViewHelpers\TableViewHelper();
+		// echo $tableViewHelper->render($tableData);
 
 	}
 
@@ -220,6 +238,7 @@ class RecordController extends \TYPO3\Flow\Mvc\Controller\ActionController {
 		$date2 = new DateTime();
 		$difference = ($this->totalActualHours - $this->totalTargetHours) * 60 * 60;
 
+		$difference = round($difference);
 		$date2->add(new \DateInterval('PT' . abs($difference) . 'S'));
 
 		$duration = $date2->diff($date1);
@@ -288,10 +307,13 @@ class RecordController extends \TYPO3\Flow\Mvc\Controller\ActionController {
 		$recordsArray = $records->toArray();
 		$hoursPerWorkingDay = $this->settings['hoursPerWorkingDay'];
 
+		\Iresults\Core\Iresults::pd($records->count());
 		foreach ($recordsArray as $record) {
 			$currentDateRecord = NULL;
 			$startDate = $record->getStart();
 			$dateKey = $startDate->format('Y-m-d');
+
+			\Iresults\Core\Iresults::pd('DATeKEY', $dateKey);
 
 			// Check if the Date object exists
 			if (isset($this->dates[$dateKey])) {
@@ -304,10 +326,8 @@ class RecordController extends \TYPO3\Flow\Mvc\Controller\ActionController {
 			$currentRecordType = NULL;
 			if ($recordType) {
 				$currentRecordType = $recordType;
-			} else if ($record instanceof Record) {
-				$currentRecordType = Record::RECORD_TYPE_STANDARD;
-			} else if ($record instanceof SpecialRecord) {
-				$currentRecordType = Record::RECORD_TYPE_SPECIAL;
+			} else {
+				$currentRecordType = $record->getRecordType();
 			}
 
 			// Add it as standard or special record
@@ -467,6 +487,7 @@ class RecordController extends \TYPO3\Flow\Mvc\Controller\ActionController {
 		$startDate = new DateTime($startDate);
 		$newRecord = new Record();
 		$newRecord->setStart($startDate);
+		$newRecord->setEnd($startDate);
 		$this->view->assign('newRecord', $newRecord);
 	}
 
@@ -478,7 +499,8 @@ class RecordController extends \TYPO3\Flow\Mvc\Controller\ActionController {
 	 */
 	public function createAction(Record $newRecord) {
 		$this->recordRepository->add($newRecord);
-		$this->flashMessageContainer->add('Your new Record was created.');
+		$message = 'Your new Record was created.';
+		$this->flashMessageContainer->addMessage(new \TYPO3\Flow\Error\Message($message, \TYPO3\Flow\Error\Message::SEVERITY_OK));
 		$this->redirect('list');
 	}
 
@@ -500,7 +522,8 @@ class RecordController extends \TYPO3\Flow\Mvc\Controller\ActionController {
 	 */
 	public function updateAction(Record $record) {
 		$this->recordRepository->update($record);
-		$this->flashMessageContainer->add('Your Record was updated.');
+		$message = 'Your Record was updated.';
+		$this->flashMessageContainer->addMessage(new \TYPO3\Flow\Error\Message($message, \TYPO3\Flow\Error\Message::SEVERITY_OK));
 		$this->redirect('list');
 	}
 
@@ -512,9 +535,9 @@ class RecordController extends \TYPO3\Flow\Mvc\Controller\ActionController {
 	 */
 	public function deleteAction(Record $record) {
 		$this->recordRepository->remove($record);
-		$this->flashMessageContainer->add('Your Record was removed.');
+		$message = 'Your Record was removed.';
+		$this->flashMessageContainer->addMessage(new \TYPO3\Flow\Error\Message($message, \TYPO3\Flow\Error\Message::SEVERITY_OK));
 		$this->redirect('list');
 	}
-
 }
 ?>

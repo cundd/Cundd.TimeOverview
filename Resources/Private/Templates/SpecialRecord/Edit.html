@@ -19,7 +19,7 @@ Otherwise your changes will be overwritten the next time you save the extension 
 <f:render partial="FormErrors" arguments="{object:SpecialRecord}"/>
 
 <f:form action="update" name="specialRecord" object="{specialRecord}" >
-<f:render partial="SpecialRecord/FormFields" arguments="{specialRecord:specialRecord}" />
-	<f:form.submit value="Save" />
+	<f:render partial="SpecialRecord/FormFields" arguments="{specialRecord:specialRecord}" />
+	<f:form.submit value="Save" class="btn" />
 </f:form>
 </f:section>

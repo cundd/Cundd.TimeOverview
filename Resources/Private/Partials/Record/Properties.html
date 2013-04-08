@@ -1,10 +1,20 @@
-<table class="tx-cundd-time-overview" >
+<table class="tx-cundd-time-overview table table-striped">
+	<f:if condition="{record.title}">
+		<tr>
+			<td>
+				<f:translate id="tx_cunddtimeoverview_domain_model_record.title" />
+			</td>
+			<td>
+				{record.title}
+			</td>
+		</tr>
+	</f:if>
 	<tr>
 		<td>
 			<f:translate id="tx_cunddtimeoverview_domain_model_record.start" />
 		</td>
 		<td>
-			{record.start -> f:format.date()}
+			<f:format.date format="Y-m-d H:i">{record.start}</f:format.date>
 		</td>
 	</tr>
 	<tr>
@@ -12,7 +22,7 @@
 			<f:translate id="tx_cunddtimeoverview_domain_model_record.end" />
 		</td>
 		<td>
-			{record.end -> f:format.date()}
+			<f:format.date format="Y-m-d H:i">{record.end}</f:format.date>
 		</td>
 	</tr>
 	<tr>

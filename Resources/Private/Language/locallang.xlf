@@ -7,6 +7,9 @@
 			<trans-unit id="tx_cunddtimeoverview_domain_model_record">
 				<source>Time record</source>
 			</trans-unit>
+			<trans-unit id="tx_cunddtimeoverview_domain_model_record.title">
+				<source>Title</source>
+			</trans-unit>
 			<trans-unit id="tx_cunddtimeoverview_domain_model_record.start">
 				<source>Start</source>
 			</trans-unit>
@@ -22,7 +25,7 @@
 			<trans-unit id="tx_cunddtimeoverview_domain_model_record.task">
 				<source>Task</source>
 			</trans-unit>
-			
+
 			<trans-unit id="tx_cunddtimeoverview_domain_model_person">
 				<source>Person</source>
 			</trans-unit>
@@ -47,7 +50,7 @@
 			<trans-unit id="tx_cunddtimeoverview_domain_model_person.special_records">
 				<source>Special time records</source>
 			</trans-unit>
-			
+
 			<trans-unit id="tx_cunddtimeoverview_domain_model_project">
 				<source>Project</source>
 			</trans-unit>
@@ -63,7 +66,7 @@
 			<trans-unit id="tx_cunddtimeoverview_domain_model_project.persons">
 				<source>Persons</source>
 			</trans-unit>
-			
+
 			<trans-unit id="tx_cunddtimeoverview_domain_model_task">
 				<source>Task</source>
 			</trans-unit>
@@ -76,7 +79,7 @@
 			<trans-unit id="tx_cunddtimeoverview_domain_model_task.records">
 				<source>Time records</source>
 			</trans-unit>
-			
+
 			<trans-unit id="tx_cunddtimeoverview_domain_model_specialrecord">
 				<source>Special time record</source>
 			</trans-unit>
@@ -101,7 +104,7 @@
 			<trans-unit id="tx_cunddtimeoverview_domain_model_specialrecord.task">
 				<source>Task</source>
 			</trans-unit>
-			
+
 		</body>
 	</file>
 </xliff>
